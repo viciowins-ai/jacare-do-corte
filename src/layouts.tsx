@@ -47,20 +47,20 @@ export function AppLayout({ children, title, showBack = false, showSettings = fa
             </main>
 
             {/* Bottom Navigation */}
-            <nav className="absolute bottom-0 left-0 right-0 bg-primary/95 backdrop-blur-sm text-white border-t border-white/10 pb-safe">
-                <div className="flex justify-around items-center h-16">
+            <nav className="absolute bottom-0 left-0 right-0 bg-primary text-white pb-safe z-50 rounded-t-2xl shadow-[0_-5px_15px_rgba(0,0,0,0.1)]">
+                <div className="flex justify-around items-center h-20 px-6">
                     {navItems.map((item) => {
                         const Icon = item.icon;
-                        const isActive = location.pathname.startsWith(item.path);
+                        const isActive = location.pathname === item.path; // Exact match for home
                         return (
                             <Link
                                 key={item.path}
                                 to={item.path}
-                                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${isActive ? 'text-secondary font-medium' : 'text-white/70 hover:text-white'
+                                className={`flex flex-col items-center justify-center space-y-1.5 transition-all duration-300 ${isActive ? 'text-secondary translate-y-[-2px]' : 'text-white/60 hover:text-white'
                                     }`}
                             >
-                                <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-                                <span className="text-xs">{item.label}</span>
+                                <Icon size={26} strokeWidth={isActive ? 2.5 : 2} />
+                                <span className={`text-[10px] font-medium tracking-wide ${isActive ? 'opacity-100' : 'opacity-80'}`}>{item.label}</span>
                             </Link>
                         );
                     })}

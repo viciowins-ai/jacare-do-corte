@@ -8,23 +8,24 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#2E5C31", // Forest Green from logo/headers
-          dark: "#1F4221",
-          light: "#3E7A42"
+          DEFAULT: "#2A4B2F", // Dark Forest Green from mockup
+          dark: "#1F3A23",
+          light: "#3E6644"
         },
         secondary: {
-          DEFAULT: "#D4AF37", // Gold from logo/stars
+          DEFAULT: "#D4AF37", // Gold
           dark: "#B8962E",
           light: "#E5C558"
         },
         background: {
           DEFAULT: "#FFFFFF",
-          muted: "#F5F5F5",
+          muted: "#F5F5F7", // Very light gray for inputs
         },
         text: {
           DEFAULT: "#1A1A1A",
           muted: "#666666",
-          light: "#FFFFFF"
+          light: "#FFFFFF",
+          green: "#2A4B2F"
         }
       },
       fontFamily: {
