@@ -1,53 +1,77 @@
-import { useLocation, Link, Navigate } from 'react-router-dom';
-import { Check } from 'lucide-react';
-import { AppLayout } from '../layouts';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Settings, Check } from 'lucide-react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 export function SuccessBookingPage() {
+    const navigate = useNavigate();
     const location = useLocation();
-    const state = location.state as { service: string; barber: string; date: string; time: string } | null;
-
-    if (!state) {
-        return <Navigate to="/home" replace />;
-    }
+    const { serviceName, barberName, date } = location.state || {};
 
     return (
-        <AppLayout title="Agendamento Confirmado" showBack>
-            <div className="flex flex-col h-full bg-primary relative overflow-hidden">
-                {/* Decorative Confetti */}
-                <div className="absolute top-10 left-10 w-2 h-2 bg-secondary rounded-full opacity-50"></div>
-                <div className="absolute top-20 right-20 w-3 h-3 bg-white rounded-full opacity-30"></div>
-                <div className="absolute bottom-1/3 left-1/4 w-2 h-2 bg-secondary rounded-full opacity-60"></div>
+        <div className="flex flex-col min-h-screen bg-[#F5F5F7]">
+            {/* Header */}
+            <div className="bg-[#2E5C38] pt-12 pb-24 px-6 flex items-center justify-between shadow-none relative z-10">
+                <button onClick={() => navigate('/home')} className="text-white">
+                    <ArrowLeft size={24} />
+                </button>
+                <h1 className="text-white text-lg font-bold">Agendamento Confirmado</h1>
+                <button className="text-white">
+                    <Settings size={24} />
+                </button>
+            </div>
 
-                <div className="flex-1 flex flex-col items-center justify-center p-6 relative z-10 w-full mb-20">
+            {/* Main Content Card - Floating Over Header */}
+            <div className="flex items-start justify-center -mt-16 z-20 px-4">
+                <div className="bg-white rounded-[30px] shadow-lg w-full p-6 pt-16 relative flex flex-col items-center text-center">
 
-                    {/* Circle Check */}
-                    <div className="w-32 h-32 rounded-full border-[6px] border-secondary flex items-center justify-center mb-[-50px] z-20 bg-primary shadow-2xl">
-                        <Check size={60} className="text-secondary" strokeWidth={5} />
+                    {/* Confetti & Checkmark Container - Floating higher than card */}
+                    <div className="absolute -top-16 left-0 right-0 flex justify-center items-center h-32 pointer-events-none">
+                        {/* CSS Confetti/Particles */}
+                        <div className="absolute top-10 left-[25%] w-1.5 h-1.5 bg-[#D4AF37] rounded-full opacity-80"></div>
+                        <div className="absolute top-4 right-[30%] w-2 h-2 bg-[#D4AF37] rounded-full opacity-60"></div>
+                        <div className="absolute top-20 right-[20%] w-1.5 h-1.5 bg-[#D4AF37] rounded-full opacity-90"></div>
+                        <div className="absolute bottom-10 left-[20%] w-1 h-1 bg-[#D4AF37] rounded-full opacity-70"></div>
+                        <div className="absolute bottom-20 right-10 w-2 h-2 bg-[#D4AF37] rounded-full opacity-50"></div>
+                        <div className="absolute top-8 left-10 w-1.5 h-1.5 bg-[#D4AF37] opacity-60 rotate-45"></div>
+                        <div className="absolute top-12 right-6 w-2 h-2 bg-[#D4AF37] opacity-60 rotate-12"></div>
+
+                        {/* Main Checkmark Circle */}
+                        <div className="w-28 h-28 bg-[#2E5C38] rounded-full border-[4px] border-[#D4AF37] flex items-center justify-center relative z-30 shadow-md">
+                            <Check size={56} strokeWidth={4} className="text-[#D4AF37]" />
+                        </div>
                     </div>
 
-                    {/* White Card */}
-                    <div className="bg-white w-full rounded-2xl pt-16 pb-8 px-6 text-center shadow-2xl">
-                        <h2 className="text-2xl font-bold text-text mb-8 leading-tight">Agendamento<br />Realizado!</h2>
+                    {/* Content */}
+                    <h2 className="text-2xl font-bold text-gray-900 mt-6 mb-1">Agendamento</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-10">Realizado!</h2>
 
-                        <div className="text-left space-y-3">
-                            <div>
-                                <p className="font-bold text-text">Serviço: <span className="font-normal text-text-muted">{state.service}</span></p>
-                            </div>
-                            <div>
-                                <p className="font-bold text-text">Profissional: <span className="font-normal text-text-muted">{state.barber}</span></p>
-                            </div>
-                            <div>
-                                <p className="font-bold text-text text-sm">Data e Hora: <span className="font-normal text-text-muted">{state.date} às {state.time}</span></p>
-                            </div>
+                    <div className="w-full text-left space-y-4 mb-10 pl-2">
+                        <div className="flex gap-2 text-sm text-gray-800">
+                            <span className="font-bold">Serviço:</span>
+                            <span className="font-normal">{serviceName || 'Corte + Barba'}</span>
+                        </div>
+                        <div className="flex gap-2 text-sm text-gray-800">
+                            <span className="font-bold">Profissional:</span>
+                            <span className="font-normal">{barberName || 'Sr. Mora'}</span>
                         </div>
 
-                        <Link to="/home" className="block w-full bg-primary text-white font-bold py-3 rounded-full mt-10 shadow-lg border border-secondary hover:bg-primary-dark transition-colors text-center">
-                            Voltar ao Início
-                        </Link>
+                        <div className="mt-2">
+                            <p className="text-gray-500 text-xs mt-1">
+                                Data e Hora: {date ? format(new Date(date), "d 'de' MMMM, yyyy - HH:mm", { locale: ptBR }) : '5 de Dezembro, 2025 - 09:00'}
+                            </p>
+                        </div>
                     </div>
+
+                    <button
+                        onClick={() => navigate('/home')}
+                        className="w-full h-14 bg-[#2E5C38] border-2 border-[#D4AF37] text-white font-bold rounded-full shadow-md text-base hover:bg-[#1E3F24] transition-colors"
+                    >
+                        Adicionar ao Calendario
+                    </button>
 
                 </div>
             </div>
-        </AppLayout>
+        </div>
     );
 }

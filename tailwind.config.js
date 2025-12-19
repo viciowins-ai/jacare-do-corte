@@ -4,28 +4,24 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#2A4B2F", // Dark Forest Green from mockup
-          dark: "#1F3A23",
-          light: "#3E6644"
+          DEFAULT: '#2E5C38', // A slightly lighter forest green based on screenshots
+          dark: '#1E3F24',
+          light: '#3E6F4A',
         },
         secondary: {
-          DEFAULT: "#D4AF37", // Gold
-          dark: "#B8962E",
-          light: "#E5C558"
+          DEFAULT: '#D4AF37', // Gold
+          dark: '#B5952F',
+          light: '#E5C558',
         },
-        background: {
-          DEFAULT: "#FFFFFF",
-          muted: "#F5F5F7", // Very light gray for inputs
-        },
+        background: '#F8F9FA',
         text: {
-          DEFAULT: "#1A1A1A",
-          muted: "#666666",
-          light: "#FFFFFF",
-          green: "#2A4B2F"
+          DEFAULT: '#1F2937',
+          muted: '#6B7280',
         }
       },
       fontFamily: {
