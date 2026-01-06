@@ -28,8 +28,86 @@ function BottomNav({ active }: { active?: string }) {
     );
 }
 
+import { supabase } from '../lib/supabase';
+import { useLocation } from 'react-router-dom';
+
 export function OTPVerificationPage() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const email = location.state?.email || 'seu-email@exemplo.com';
+    const [otp, setOtp] = useState(['', '', '', '', '', '']);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+    useEffect(() => {
+        // Auto focus first input
+        if (inputRefs.current[0]) {
+            inputRefs.current[0].focus();
+        }
+    }, []);
+
+    const handleChange = (index: number, value: string) => {
+        if (!/^\d*$/.test(value)) return;
+
+        const newOtp = [...otp];
+        newOtp[index] = value;
+        setOtp(newOtp);
+
+        // Move to next input
+        if (value !== '' && index < 5) {
+            inputRefs.current[index + 1]?.focus();
+        }
+    };
+
+    const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+        // Move to previous input on Backspace if empty
+        if (e.key === 'Backspace' && index > 0 && otp[index] === '') {
+            inputRefs.current[index - 1]?.focus();
+        }
+    };
+
+    const handleVerify = async () => {
+        const code = otp.join('');
+        if (code.length !== 6) {
+            setError('Por favor, preencha todos os dígitos.');
+            return;
+        }
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const { error } = await supabase.auth.verifyOtp({
+                email,
+                token: code,
+                type: 'signup'
+            });
+
+            if (error) throw error;
+
+            navigate('/home');
+        } catch (err: any) {
+            setError(err.message || 'Código inválido ou expirado.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResend = async () => {
+        try {
+            const { error } = await supabase.auth.resend({
+                type: 'signup',
+                email: email
+            });
+            if (error) throw error;
+            alert('Código reenviado para seu e-mail!');
+        } catch (err: any) {
+            alert('Erro ao reenviar código: ' + err.message);
+        }
+    };
+
     return (
         <div className="flex flex-col min-h-screen bg-[#F5F5F7] pb-24 max-w-md mx-auto shadow-2xl relative overflow-hidden">
             {/* Header */}
@@ -52,21 +130,36 @@ export function OTPVerificationPage() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Verifique seu E-mail</h2>
                 <p className="text-center text-gray-500 mb-8 text-sm max-w-xs">
                     Enviamos um código de 6 dígitos para <br />
-                    <span className="font-medium text-gray-700">usu@email.com</span>
+                    <span className="font-medium text-gray-700">{email}</span>
                 </p>
 
+                {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
                 {/* OTP Inputs */}
-                <div className="flex gap-3 mb-8">
-                    {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <div key={i} className="w-12 h-14 border border-gray-300 rounded-xl bg-gray-50 flex items-center justify-center text-xl font-bold text-gray-800 shadow-sm"></div>
+                <div className="flex gap-2 mb-8 justify-center">
+                    {otp.map((digit, i) => (
+                        <input
+                            key={i}
+                            ref={el => inputRefs.current[i] = el}
+                            type="text"
+                            maxLength={1}
+                            value={digit}
+                            onChange={(e) => handleChange(i, e.target.value)}
+                            onKeyDown={(e) => handleKeyDown(i, e)}
+                            className="w-12 h-14 border border-gray-300 rounded-xl bg-gray-50 flex items-center justify-center text-xl font-bold text-gray-800 shadow-sm text-center focus:border-[#2E5C38] focus:ring-1 focus:ring-[#2E5C38] outline-none transition-all"
+                        />
                     ))}
                 </div>
 
-                <button className="w-full h-14 bg-[#2E5C38] text-white font-bold rounded-full shadow-lg mb-6 text-lg hover:bg-[#1E3F24] transition-colors">
-                    Confirmar Código
+                <button
+                    onClick={handleVerify}
+                    disabled={loading}
+                    className="w-full h-14 bg-[#2E5C38] text-white font-bold rounded-full shadow-lg mb-6 text-lg hover:bg-[#1E3F24] transition-colors disabled:opacity-70 flex items-center justify-center"
+                >
+                    {loading ? 'Verificando...' : 'Confirmar Código'}
                 </button>
 
-                <button className="text-gray-500 text-sm font-medium hover:text-[#2E5C38] transition-colors">
+                <button onClick={handleResend} className="text-gray-500 text-sm font-medium hover:text-[#2E5C38] transition-colors">
                     Reenviar código
                 </button>
             </div>
@@ -590,7 +683,7 @@ export function SettingsPage() {
                 {/* Appearance Card - Gray Accent */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm flex flex-col">
                     <div className="flex">
-                        <div className="w-2 bg-gray-400 shrink-0"></div>
+                        <div className="w-2 bg-[#2E5C38] shrink-0"></div>
                         <div className="p-4 flex-1">
                             {/* Typo "Colticações" in screenshot -> "Aparência" */}
                             <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2">Aparência</h3>
@@ -643,7 +736,7 @@ export function SupportPage() {
                 <button onClick={() => navigate(-1)} className="text-white">
                     <ArrowLeft size={24} />
                 </button>
-                <h1 className="text-white text-lg font-bold">Central e Suporte</h1>
+                <h1 className="text-white text-lg font-bold">Central de Suporte</h1>
                 <Settings className="text-white" size={24} />
             </div>
 
@@ -653,7 +746,7 @@ export function SupportPage() {
                     <img src="/logo_jacare.jpg" alt="Logo" className="w-full h-full object-cover scale-110" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900 leading-tight">Jacaré do Corte</h2>
-                <p className="text-gray-500 text-sm">Lacaré do Corte</p>
+                <p className="text-gray-500 text-sm">Jacaré do Corte</p>
             </div>
 
             {/* Scrollable List Section */}

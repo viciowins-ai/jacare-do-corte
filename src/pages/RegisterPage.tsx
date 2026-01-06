@@ -42,8 +42,9 @@ export function RegisterPage() {
             if (data.session) {
                 navigate('/home');
             } else {
-                alert('Cadastro realizado! Por favor, faça login.');
-                navigate('/login');
+                // Se não houver sessão, significa que o email precisa de confirmação
+                // Navega para a tela de OTP passando o email
+                navigate('/verify-otp', { state: { email } });
             }
 
         } catch (err: any) {
