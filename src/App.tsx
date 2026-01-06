@@ -10,6 +10,7 @@ import { HomePage } from './pages/HomePage';
 import { SchedulePage } from './pages/SchedulePage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SuccessBookingPage } from './pages/SuccessBookingPage';
+import { AdminDashboardPage } from './pages/AdminDashboardPage';
 
 // Secondary Pages (Placeholder for now, mapped to Support/About/Settings if they exist or fallback)
 // Assuming SecondaryPages.tsx exists or we might need to create placeholders if they break build.
@@ -58,6 +59,7 @@ export default function App() {
             <Route path="/report" element={<ReportProblemPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/terms" element={<TermsPage />} />
+            <Route path="/admin" element={<AdminDashboardPage />} />
 
             {/* Success Booking might technically be full screen, but usually fits in app flow. 
                 Screenshot showed no nav? Actually Step 200 Image 2 shows Bottom Nav!

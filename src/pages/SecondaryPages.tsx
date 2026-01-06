@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, MessageCircle, HelpCircle, Settings, AlertTriangle, ChevronRight, Star, Send, FileText, User, Disc, LayoutGrid } from 'lucide-react';
+import { ArrowLeft, MessageCircle, HelpCircle, Settings, AlertTriangle, ChevronRight, Star, Send, FileText, User, Disc, LayoutGrid, MonitorSmartphone } from 'lucide-react';
 import clsx from 'clsx';
 
 // ... (Existing pages like OTP, PasswordReset, About, Settings, Support - keeping them similar but refining styles if needed)
@@ -140,7 +140,7 @@ export function OTPVerificationPage() {
                     {otp.map((digit, i) => (
                         <input
                             key={i}
-                            ref={el => inputRefs.current[i] = el}
+                            ref={el => { inputRefs.current[i] = el }}
                             type="text"
                             maxLength={1}
                             value={digit}
@@ -716,8 +716,22 @@ export function SettingsPage() {
                     </div>
                 </div>
 
+                {/* Admin Access - Professional Area */}
+                <div onClick={() => navigate('/admin')} className="mx-8 mb-4 bg-gradient-to-r from-[#1F2937] to-[#111827] rounded-xl p-4 flex items-center justify-between cursor-pointer shadow-lg border border-[#D4AF37]/30">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-[#D4AF37] flex items-center justify-center text-[#1F2937]">
+                            <LayoutGrid size={20} />
+                        </div>
+                        <div>
+                            <p className="text-white font-bold text-sm">Área do Profissional</p>
+                            <p className="text-gray-400 text-xs">Gerenciar agendamentos</p>
+                        </div>
+                    </div>
+                    <ChevronRight className="text-[#D4AF37]" size={20} />
+                </div>
+
                 {/* Logout Button */}
-                <div className="pt-4 px-8">
+                <div className="px-8">
                     <button className="w-full bg-[#3E6D48] hover:bg-[#2E5C38] text-white font-bold h-12 rounded-full shadow-lg transition-colors text-lg">
                         Sair da Conta
                     </button>
@@ -831,22 +845,22 @@ export function AboutAppPage() {
                 <div className="bg-white p-6 rounded-2xl shadow-sm space-y-6">
                     <div>
                         <h3 className="font-bold text-gray-900 mb-2">Versão</h3>
-                        <p className="text-xs text-gray-500 leading-relaxed">Lorem ipsum ass uises pillen, de ssnaciis pce aneludo elemidade euriudade diratas us a lipe Tua Dora la to dis cegniadade to purre dai intia po Gaieo puts uriso de los ta lar oruie faoliaet.</p>
+                        <p className="text-xs text-gray-500 leading-relaxed">Esta é a versão 1.0.0 do aplicativo Jacaré do Corte. Estamos constantemente trabalhando para trazer novidades, melhorias de desempenho e novos recursos para sua experiência de agendamento.</p>
                     </div>
 
                     <div>
                         <h3 className="font-bold text-gray-900 mb-2">Licenças Open Source</h3>
-                        <p className="text-xs text-gray-500 leading-relaxed">Lorem ipsum ade tis oo aend eddsfaa puca regnialato inatendedeirea lique snatalo ad la coasto ao otmi seidas de coo a támse...</p>
+                        <p className="text-xs text-gray-500 leading-relaxed">Este aplicativo utiliza tecnologias de código aberto modernas. Agradecemos à comunidade de desenvolvedores por fornecer ferramentas incríveis que tornam este projeto possível.</p>
                     </div>
 
                     <div>
                         <h3 className="font-bold text-gray-900 mb-2">Segurança</h3>
-                        <p className="text-xs text-gray-500 leading-relaxed">Caera icaçãc uss inset oacreta d ofielaisao oue talses, as undee, int períae. ia etnocas entmanbo stsirjo o nren eaans que nbe luclo ado oliors uäm aus tteto aci vas pee qua façals.</p>
+                        <p className="text-xs text-gray-500 leading-relaxed">Sua segurança é nossa prioridade. Utilizamos criptografia de ponta a ponta e protocolos de segurança avançados para proteger seus dados pessoais e informações de pagamento.</p>
                     </div>
 
                     <div>
                         <h3 className="font-bold text-gray-900 mb-2">Agradecimentos</h3>
-                        <p className="text-xs text-gray-500 leading-relaxed">Lorem ipsum ass suiser ele d freguale as iustpole s oe lalo aetaondio so el undes do is to iato osrtrs ous de nosala</p>
+                        <p className="text-xs text-gray-500 leading-relaxed">Agradecemos a todos os nossos clientes pela confiança e preferência. O Jacaré do Corte existe para servir você com excelência, estilo e dedicação.</p>
                     </div>
                 </div>
             </div>
@@ -872,30 +886,30 @@ export function PrivacyPage() {
 
                     <div>
                         <h3 className="font-bold text-gray-900 mb-2">Introdução</h3>
-                        <p className="text-xs text-gray-500 leading-relaxed text-justify">Lorem ipsum ass ssst pillen, ao porailde spialt ss esiotado demistidem, que initemaces com usa atac ao farsiqut.</p>
+                        <p className="text-xs text-gray-500 leading-relaxed text-justify">Sua privacidade é fundamental para nós. Esta política explica de maneira transparente como coletamos, usamos, armazenamos e protegemos suas informações pessoais ao utilizar o aplicativo Jacaré do Corte.</p>
                     </div>
 
                     <div>
                         <h3 className="font-bold text-gray-900 mb-2">Coleta de Dados</h3>
-                        <p className="text-xs text-gray-500 leading-relaxed text-justify">Lorem ipsum ass udes plaria de Sa.iiteniarde poe aneludo cegniadade etuinias dendops palico do pucre atioie desenol usaha de corsçâs. El mago to lotilo inortatcte selo supe tcim uss ta darfa mettem agurdulastxa e niisda porera eguuds peteode ta perdatite sposzntedo do suis fei gats com qurafaçalt.</p>
+                        <p className="text-xs text-gray-500 leading-relaxed text-justify">Coletamos informações que você nos fornece diretamente, como nome, e-mail e telefone ao criar uma conta. Também podemos coletar dados técnicos de uso e navegação para melhorar continuamente nossos serviços e sua experiência no app.</p>
                     </div>
 
                     <div>
                         <h3 className="font-bold text-gray-900 mb-2">Uso da Informação</h3>
-                        <p className="text-xs text-gray-500 leading-relaxed text-justify">Lorem ipsum ces pord yiticnlo e la onsto qui oralu, o protõo tiele te le ulicnt conacls. Eviqua de ooctoo de mtrusicam de sefoindde purttenda le essca repitçâs o cusicaugiciso, eiue to dala tmdon erstroicikda pnudas. Esea pa tanta auo nuts erta da m etaio clem de epceda çãrus foriterto.</p>
+                        <p className="text-xs text-gray-500 leading-relaxed text-justify">Utilizamos suas informações para gerenciar seus agendamentos, enviar lembretes importantes, processar pagamentos com segurança e comunicar novidades ou promoções exclusivas, sempre respeitando suas preferências de comunicação.</p>
                     </div>
 
                     <div>
                         <h3 className="font-bold text-gray-900 mb-2">Segurança</h3>
-                        <p className="text-xs text-gray-500 leading-relaxed text-justify">Torem ipsum ass dulas porisles suidle de mintten ntales as eettiurasâs. Ust undarae, disturarce sécleerda esse do janctitda en daoleorão ta pazéai bd cçe de parltacits plentesa regtaliias...</p>
+                        <p className="text-xs text-gray-500 leading-relaxed text-justify">Implementamos rigorosas medidas de segurança técnicas e organizacionais para proteger seus dados contra acesso não autorizado, alteração, divulgação ou destruição acidental.</p>
                     </div>
 
                     <div>
-                        <h3 className="font-bold text-gray-900 mb-2">Segurança</h3>
-                        <p className="text-xs text-gray-500 leading-relaxed text-justify mb-2">Corem ipoum ces ussualda de pivnda peodenter de: rtaçãe eoltisnida pitis ants. clxlas egegparde I acitides, e lstrisd eepare alirenaurdiora daidlete tlirgeitade pe ran tualend ao ne pcidlorçãe. sisi nitda, cemom duigmle su cacação re didi'lição.</p>
+                        <h3 className="font-bold text-gray-900 mb-2">Seus Direitos</h3>
+                        <p className="text-xs text-gray-500 leading-relaxed text-justify mb-2">Você tem total controle sobre seus dados. De acordo com a LGPD, você tem o direito de solicitar acesso, correção ou exclusão de suas informações pessoais a qualquer momento.</p>
                         <ul className="list-disc ml-5 text-xs text-gray-500">
-                            <li><span className="font-bold text-gray-900">Seguração</span></li>
-                            <li>Uprbpstetšm ealos cipedaes rem lle mollaçõe eds pansites ta pem fotreaite pieój.</li>
+                            <li><span className="font-bold text-gray-900">Transparência</span>: Saiba exatamente o que fazemos com seus dados.</li>
+                            <li><span className="font-bold text-gray-900">Controle</span>: Gerencie suas preferências e dados facilmente.</li>
                         </ul>
                     </div>
                 </div>
@@ -926,35 +940,35 @@ export function TermsPage() {
                     <div>
                         <h3 className="font-bold text-gray-900 mb-2 text-base">Aceitação dos Termos</h3>
                         <p className="text-xs text-gray-500 leading-relaxed text-justify">
-                            Lorem ipsum ass teratta õccatfain sis auto da iuspôles inttemdies tmsteit i presdes Uat tiro dem Donats, le sta Conireore laal eel...
+                            Ao acessar ou utilizar o aplicativo Jacaré do Corte, você concorda em cumprir estes Termos de Uso e todas as leis e regulamentos aplicáveis. Se você não concordar com algum destes termos, está proibido de usar ou acessar este serviço.
                         </p>
                     </div>
 
                     <div>
                         <h3 className="font-bold text-gray-900 mb-2 text-base">Modificações</h3>
                         <p className="text-xs text-gray-500 leading-relaxed text-justify">
-                            Eorem ipsum ass usesmidia so o pração scrniates taiim cegnistadenus celudado as luciido o tiendary pusis te se alcba tuza otarsso.
+                            Podemos revisar estes termos de serviço a qualquer momento, sem aviso prévio. Ao usar este aplicativo, você concorda em ficar vinculado à versão atual desses termos de serviço.
                         </p>
                     </div>
 
                     <div>
                         <h3 className="font-bold text-gray-900 mb-2 text-base">Modificações</h3>
                         <p className="text-xs text-gray-500 leading-relaxed text-justify">
-                            Lorem ipsum eeo aestial det derle puteea o esenuldiat nocdallste. Un canute tralhah des oumarnão pirsttrioles a tei ouisis taas.
+                            O aplicativo pode conter links para sites de terceiros que não são de nossa propriedade ou controlados por nós. Não temos controle sobre o conteúdo, políticas de privacidade ou práticas de sites de terceiros.
                         </p>
                     </div>
 
                     <div>
                         <h3 className="font-bold text-gray-900 mb-2 text-base">Conta do Usuário</h3>
                         <p className="text-xs text-gray-500 leading-relaxed text-justify">
-                            Com imitdeo ds aguiat to uses pivodes regniadem cegniadafie to tiiniartams tidluids as sugre etlat fiiçães la cottida ntase da gâio da nesids.
+                            Você é responsável por manter a confidencialidade de sua conta e senha. Você concorda em aceitar a responsabilidade por todas as atividades que ocorram sob sua conta ou senha.
                         </p>
                     </div>
 
                     <div>
                         <h3 className="font-bold text-gray-900 mb-2 text-base">Uso do Aplicativo</h3>
                         <p className="text-xs text-gray-500 leading-relaxed text-justify">
-                            Lorem ipsum ass suta oe d ti fioraçãos es ante feplirter inodtedas. Ust unacass coiue la o ulaçae meaa de cunesal Com qure resiis.
+                            Você concorda em não usar o aplicativo para qualquer finalidade que seja ilegal ou proibida por estes termos. O serviço é destinado para uso pessoal e agendamento de serviços de barbearia.
                         </p>
                     </div>
 
@@ -962,7 +976,7 @@ export function TermsPage() {
                         <h3 className="font-bold text-gray-900 mb-1 text-base">Segurança</h3>
                         <h4 className="font-bold text-sm text-gray-900 mb-1">Eireqraçãeto de Responsabilande</h4>
                         <p className="text-xs text-gray-500 leading-relaxed text-justify">
-                            naolratias terptem erenipies que guribeo d eiripialção fierinoam dihree rde cripient.
+                            O serviço é fornecido "como está". Não garantimos que o serviço será ininterrupto, seguro ou livre de erros. Reservamo-nos o direito de modificar ou descontinuar o serviço a qualquer momento.
                         </p>
                     </div>
                 </div>

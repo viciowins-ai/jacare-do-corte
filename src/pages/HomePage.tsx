@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { MockDB } from '../lib/mockDb';
 
 interface Appointment {
     id: string;
@@ -29,20 +30,29 @@ export function HomePage() {
 
     const loadAppointments = async () => {
         try {
-            const { data, error } = await supabase
-                .from('appointments')
-                .select(`
-          id,
-          start_time,
-          status,
-          barbers (name, avatar_url),
-          services (name, price, duration_minutes)
-        `)
-                .eq('user_id', session?.user.id)
-                .order('start_time', { ascending: true });
+            let supabaseData: any[] = [];
 
-            if (error) throw error;
-            setAppointments((data as any) || []);
+            try {
+                const { data, error } = await supabase
+                    .from('appointments')
+                    .select(`
+            id,
+            start_time,
+            status,
+            barbers (name, avatar_url),
+            services (name, price, duration_minutes)
+            `)
+                    .eq('user_id', session?.user.id)
+                    .order('start_time', { ascending: true });
+
+                if (!error && data) supabaseData = data;
+            } catch (e) { console.warn('Supabase fetch error', e); }
+
+            // Local Data
+            const localData = MockDB.getAppointments().filter(a => a.user_id === session?.user.id);
+
+            setAppointments(([...supabaseData, ...localData] as any));
+
         } catch (error) {
             console.error('Error loading appointments:', error);
         } finally {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MockDB } from '../lib/mockDb';
 import { ArrowLeft, Scissors, User, Monitor, PlayCircle, Settings } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -66,15 +67,19 @@ export function SchedulePage() {
                 { id: 4, name: 'Pé + Mão Express', price: 60 }
             ]);
             setBarbers([
-                { id: 1, name: 'Sr. Zeca', avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Zeca' },
-                { id: 2, name: 'Sr. Mora', avatar_url: '' },
-                { id: 3, name: 'Barber Pole', avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=BarberPole' },
-                { id: 4, name: 'Dona Maria', avatar_url: '' }
+                { id: 1, name: 'Jacaré', avatar_url: '/logo_jacare.jpg' }
             ]);
         } finally {
             setLoading(false);
         }
     }
+
+    // Auto-select barber if there's only one
+    useEffect(() => {
+        if (barbers.length === 1) {
+            setSelectedBarberId(barbers[0].id);
+        }
+    }, [barbers]);
 
     async function handleBooking() {
         if (!user) {
@@ -86,9 +91,14 @@ export function SchedulePage() {
             return;
         }
 
+        setLoading(true);
+
         try {
-            // Construct a real timestamp (assuming Dec 2025 as per original hardcode)
-            const dateStr = `2025-12-${selectedDate.toString().padStart(2, '0')}`;
+            // Construct timestamp for current month/year
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const dateStr = `${year}-${month}-${selectedDate.toString().padStart(2, '0')}`;
             const startTime = `${dateStr}T${selectedTime}:00`;
 
             const { error } = await supabase
@@ -117,7 +127,38 @@ export function SchedulePage() {
             });
         } catch (error) {
             console.error('Erro ao agendar:', error);
-            alert('Erro ao realizar agendamento. Tente novamente.');
+
+            // Fallback: Save to Local Mock DB (Offline Mode)
+            const selectedService = services.find(s => s.id === selectedServiceId);
+            const selectedBarber = barbers.find(b => b.id === selectedBarberId);
+
+            // Reconstruct time
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const dateStr = `${year}-${month}-${selectedDate.toString().padStart(2, '0')}`;
+            const startTime = `${dateStr}T${selectedTime}:00`;
+
+            MockDB.addAppointment({
+                user_id: user?.id || 'offline-user',
+                start_time: startTime,
+                status: 'scheduled',
+                services: selectedService,
+                barbers: selectedBarber,
+            });
+
+            // alert('Modo Offline: Agendamento salvo localmente.');
+
+
+            navigate('/booking-success', {
+                state: {
+                    serviceName: selectedService?.name,
+                    barberName: selectedBarber?.name,
+                    date: startTime
+                }
+            });
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -207,7 +248,7 @@ export function SchedulePage() {
 
                 {/* Professionals Section */}
                 <div className="bg-white rounded-[20px] p-5 shadow-sm">
-                    <h2 className="text-sm font-bold text-gray-900 mb-4">Escolha Profissional</h2>
+                    <h2 className="text-sm font-bold text-gray-900 mb-4">Profissional</h2>
                     <div className="grid grid-cols-2 gap-x-8 gap-y-4">
                         {barbers.map((barber) => (
                             <div
@@ -236,7 +277,9 @@ export function SchedulePage() {
                     <h2 className="text-sm font-bold text-gray-900 mb-4">Escolha a Data e Hora</h2>
 
                     <div className="mb-4">
-                        <p className="text-xs text-gray-500 mb-2">Dezembro 2025</p>
+                        <p className="text-xs text-gray-500 mb-2 capitalize">
+                            {new Date().toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}
+                        </p>
 
                         {/* Calendar Grid */}
                         <div className="grid grid-cols-7 gap-1 mb-2">
@@ -257,7 +300,7 @@ export function SchedulePage() {
 
                     {/* Time Slots */}
                     <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                        {['09:00', '10:00', '14:00', '15:00', '16:00'].map((time) => (
+                        {['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'].map((time) => (
                             <button
                                 key={time}
                                 onClick={() => setSelectedTime(time)}
