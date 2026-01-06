@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, MessageCircle, HelpCircle, Settings, AlertTriangle, ChevronRight, Star, Send, FileText, User, PlayCircle, Monitor, MonitorSmartphone } from 'lucide-react';
+import { ArrowLeft, MessageCircle, HelpCircle, Settings, AlertTriangle, ChevronRight, Star, Send, FileText, User, Disc, LayoutGrid } from 'lucide-react';
 import clsx from 'clsx';
 
 // ... (Existing pages like OTP, PasswordReset, About, Settings, Support - keeping them similar but refining styles if needed)
@@ -11,17 +11,17 @@ function BottomNav({ active }: { active?: string }) {
     const isActive = (path: string) => active === path;
 
     return (
-        <nav className="absolute bottom-0 w-full h-[70px] bg-[#2E5C38] rounded-t-[20px] flex items-center justify-around px-2 z-50">
+        <nav className="absolute bottom-0 w-full h-[70px] bg-[#374151] rounded-t-[20px] flex items-center justify-around px-2 z-50">
             <button onClick={() => navigate('/home')} className={clsx("flex flex-col items-center justify-center w-16 gap-1", isActive('/home') ? "text-[#D4AF37]" : "text-white/70 hover:text-white")}>
                 <User size={26} strokeWidth={isActive('/home') ? 2.5 : 2} />
                 <span className={clsx("text-[11px] font-medium tracking-wide", isActive('/home') ? "opacity-100" : "opacity-80")}>Início</span>
             </button>
             <button onClick={() => navigate('/agendar')} className={clsx("flex flex-col items-center justify-center w-16 gap-1", isActive('/agendar') ? "text-[#D4AF37]" : "text-white/70 hover:text-white")}>
-                <PlayCircle size={26} strokeWidth={isActive('/agendar') ? 2.5 : 2} />
+                <Disc size={26} strokeWidth={isActive('/agendar') ? 2.5 : 2} />
                 <span className={clsx("text-[11px] font-medium tracking-wide", isActive('/agendar') ? "opacity-100" : "opacity-80")}>Agendar</span>
             </button>
             <button onClick={() => navigate('/perfil')} className={clsx("flex flex-col items-center justify-center w-16 gap-1", isActive('/perfil') ? "text-[#D4AF37]" : "text-white/70 hover:text-white")}>
-                <Monitor size={26} strokeWidth={isActive('/perfil') ? 2.5 : 2} />
+                <LayoutGrid size={26} strokeWidth={isActive('/perfil') ? 2.5 : 2} />
                 <span className={clsx("text-[11px] font-medium tracking-wide", isActive('/perfil') ? "opacity-100" : "opacity-80")}>Perfil</span>
             </button>
         </nav>
