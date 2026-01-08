@@ -41,6 +41,27 @@ export function AdminDashboardPage() {
     const [stats, setStats] = useState({ todayCount: 0, todayRevenue: 0 });
     const [automations, setAutomations] = useState(MOCK_AUTOMATIONS);
     const [activeTab, setActiveTab] = useState<'daily' | 'automations'>('daily');
+    const [showNotifications, setShowNotifications] = useState(false);
+    const [showCustomers, setShowCustomers] = useState(false);
+
+    // Mock Data for new features
+    const [notificationsList, setNotificationsList] = useState([
+        { id: 1, text: 'Novo agendamento: João Silva - 14:00', time: '5 min', unread: true },
+        { id: 2, text: 'Maria cancelou o horário de 16:30', time: '1h', unread: true },
+        { id: 3, text: 'Meta de faturamento diária atingida! 🚀', time: '2h', unread: false },
+    ]);
+
+    const markAllAsRead = () => {
+        setNotificationsList(prev => prev.map(n => ({ ...n, unread: false })));
+        // In a real app, we would also update this in the backend
+    };
+
+    const customers = [
+        { id: 1, name: 'João Silva', phone: '(11) 99999-1111', lastVisit: 'Hoje' },
+        { id: 2, name: 'Maria Oliveira', phone: '(11) 98888-2222', lastVisit: 'Ontem' },
+        { id: 3, name: 'Pedro Santos', phone: '(11) 97777-3333', lastVisit: 'Há 5 dias' },
+        { id: 4, name: 'Carlos Souza', phone: '(11) 96666-4444', lastVisit: 'Há 1 semana' },
+    ];
 
     useEffect(() => {
         fetchAppointments();
@@ -148,14 +169,77 @@ export function AdminDashboardPage() {
                         </h1>
                         <p className="text-gray-400 text-xs mt-1">Bem-vindo, Chefe</p>
                     </div>
-                    <div className="flex gap-3">
-                        <button className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm relative">
+                    <div className="flex gap-3 relative">
+                        <button
+                            onClick={() => { setShowNotifications(!showNotifications); setShowCustomers(false); }}
+                            className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm relative hover:bg-white/20 transition-colors"
+                        >
                             <Bell size={20} />
-                            <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></div>
+                            {notificationsList.some(n => n.unread) && (
+                                <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                            )}
                         </button>
-                        <button className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm">
+                        <button
+                            onClick={() => { setShowCustomers(!showCustomers); setShowNotifications(false); }}
+                            className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm hover:bg-white/20 transition-colors"
+                        >
                             <Users size={20} />
                         </button>
+
+                        {/* Notifications Dropdown */}
+                        {showNotifications && (
+                            <div className="absolute top-12 right-0 w-72 bg-white rounded-xl shadow-2xl overflow-hidden z-50 text-gray-800 border border-gray-100 animate-in fade-in slide-in-from-top-2">
+                                <div className="p-3 bg-gray-50 border-b border-gray-100 font-bold text-sm">Notificações</div>
+                                <div className="max-h-64 overflow-y-auto">
+                                    {notificationsList.map(n => (
+                                        <div key={n.id} className={`p-3 border-b border-gray-50 text-sm hover:bg-gray-50 cursor-pointer ${n.unread ? 'bg-blue-50/50' : ''}`}>
+                                            <p className="font-medium text-gray-800">{n.text}</p>
+                                            <p className="text-xs text-gray-400 mt-1">{n.time} atrás</p>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="p-2 text-center border-t border-gray-100 bg-gray-50">
+                                    <button
+                                        onClick={markAllAsRead}
+                                        className="text-xs font-bold text-[#2E5C38] hover:underline"
+                                    >
+                                        Marcar todas como lidas
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Customers Dropdown */}
+                        {showCustomers && (
+                            <div className="absolute top-12 right-0 w-80 bg-white rounded-xl shadow-2xl overflow-hidden z-50 text-gray-800 border border-gray-100 animate-in fade-in slide-in-from-top-2">
+                                <div className="p-3 bg-gray-50 border-b border-gray-100 font-bold text-sm flex justify-between items-center">
+                                    <span>Clientes Recentes</span>
+                                    <span className="bg-[#2E5C38] text-white text-[10px] px-2 py-0.5 rounded-full">{customers.length}</span>
+                                </div>
+                                <div className="max-h-96 overflow-y-auto">
+                                    {customers.map(c => (
+                                        <div key={c.id} className="p-3 border-b border-gray-50 flex items-center justify-between hover:bg-gray-50 group cursor-pointer">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
+                                                    {c.name.charAt(0)}
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-sm text-gray-900">{c.name}</p>
+                                                    <p className="text-xs text-gray-500">{c.phone}</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-[10px] text-gray-400">Última vez</p>
+                                                <p className="text-xs font-medium text-[#2E5C38]">{c.lastVisit}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="p-2 text-center border-t border-gray-100 bg-gray-50">
+                                    <button className="text-xs font-bold text-[#2E5C38]">Ver lista completa</button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
