@@ -33,5 +33,16 @@ export const MockDB = {
         const updated = [...current, newAppointment];
         localStorage.setItem(MockDB.KEY, JSON.stringify(updated));
         return newAppointment;
+    },
+
+    updateAppointment: (id: string, updates: Partial<Appointment>) => {
+        const current = MockDB.getAppointments();
+        const index = current.findIndex(a => a.id === id);
+        if (index !== -1) {
+            current[index] = { ...current[index], ...updates };
+            localStorage.setItem(MockDB.KEY, JSON.stringify(current));
+            return true;
+        }
+        return false;
     }
 };

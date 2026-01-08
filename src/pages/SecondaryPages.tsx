@@ -616,29 +616,17 @@ export function ReportProblemPage() {
     )
 }
 
+import { useTheme } from '../contexts/ThemeContext';
+
 export function SettingsPage() {
     const navigate = useNavigate();
+    const { darkMode, toggleDarkMode } = useTheme();
 
-    // Initialize state from localStorage or defaults
+    // Initialize state for notifications
     const [notifications, setNotifications] = useState(() => {
         const saved = localStorage.getItem('notifications');
         return saved !== null ? JSON.parse(saved) : true;
     });
-
-    const [darkMode, setDarkMode] = useState(() => {
-        const saved = localStorage.getItem('darkMode');
-        return saved !== null ? JSON.parse(saved) : false;
-    });
-
-    // Effect to apply dark mode class
-    useEffect(() => {
-        if (darkMode) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-        localStorage.setItem('darkMode', JSON.stringify(darkMode));
-    }, [darkMode]);
 
     // Effect to persist notifications
     useEffect(() => {
@@ -646,7 +634,7 @@ export function SettingsPage() {
     }, [notifications]);
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#F5F5F7] dark:bg-gray-900 pb-24 transition-colors duration-300">
+        <div className="flex flex-col min-h-screen bg-[#F5F5F7] dark:bg-gray-900 pb-40 transition-colors duration-300">
             <div className="bg-[#2E5C38] pt-12 pb-6 px-4 flex items-center justify-between shadow-sm">
                 <button onClick={() => navigate(-1)} className="text-white"><ArrowLeft size={24} /></button>
                 <h1 className="text-white text-lg font-bold">Configurações do App</h1>
@@ -693,7 +681,7 @@ export function SettingsPage() {
 
                                 {/* Toggle */}
                                 <button
-                                    onClick={() => setDarkMode(!darkMode)}
+                                    onClick={toggleDarkMode}
                                     className={`w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-200 ${darkMode ? 'bg-[#2E5C38]' : 'bg-gray-300'}`}
                                 >
                                     <div className={`w-4 h-4 bg-white rounded-full absolute top-1 shadow-sm transition-all duration-200 ${darkMode ? 'right-1' : 'left-1'}`}></div>
@@ -732,7 +720,13 @@ export function SettingsPage() {
 
                 {/* Logout Button */}
                 <div className="px-8">
-                    <button className="w-full bg-[#3E6D48] hover:bg-[#2E5C38] text-white font-bold h-12 rounded-full shadow-lg transition-colors text-lg">
+                    <button
+                        onClick={async () => {
+                            await supabase.auth.signOut();
+                            navigate('/login');
+                        }}
+                        className="w-full bg-[#3E6D48] hover:bg-[#2E5C38] text-white font-bold h-12 rounded-full shadow-lg transition-colors text-lg"
+                    >
                         Sair da Conta
                     </button>
                 </div>

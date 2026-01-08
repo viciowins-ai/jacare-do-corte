@@ -83,7 +83,7 @@ export function HomePage() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#F5F5F7] pb-24 relative">
+        <div className="flex flex-col min-h-screen bg-[#F5F5F7] dark:bg-gray-900 pb-24 relative transition-colors duration-300">
             {/* Header */}
             <div className="bg-[#2E5C38] pt-12 p-6 flex flex-col items-center relative z-10">
                 <div className="w-full flex items-center justify-between mb-4">
@@ -102,8 +102,8 @@ export function HomePage() {
             </div>
 
             {/* Content Container */}
-            <div className="flex-1 bg-white rounded-t-[30px] -mt-6 relative z-20 px-6 pt-8 pb-20 shadow-[-10px_-10px_30px_rgba(0,0,0,0.1)]">
-                <h2 className="text-center text-xl font-bold text-gray-900 mb-6">Meus Agendamentos</h2>
+            <div className="flex-1 bg-white dark:bg-gray-800 rounded-t-[30px] -mt-6 relative z-20 px-6 pt-8 pb-20 shadow-[-10px_-10px_30px_rgba(0,0,0,0.1)] transition-colors duration-300">
+                <h2 className="text-center text-xl font-bold text-gray-900 dark:text-white mb-6">Meus Agendamentos</h2>
 
                 {loading ? (
                     <div className="text-center text-gray-500 py-10">Carregando...</div>
@@ -112,17 +112,17 @@ export function HomePage() {
                 ) : (
                     <div className="space-y-4 mb-8">
                         {appointments.map((apt, index) => (
-                            <div key={apt.id} className="bg-white border border-gray-100 rounded-2xl shadow-sm flex relative overflow-hidden">
+                            <div key={apt.id} className="bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-2xl shadow-sm flex relative overflow-hidden transition-colors">
                                 {/* Green Strip */}
                                 <div className={`w-3 ${index === 0 ? 'bg-[#2E5C38]' : 'bg-transparent'} h-full absolute left-0 top-0`}></div>
 
                                 <div className="flex-1 p-4 pl-6 relative">
                                     <div className="flex justify-between items-start mb-1">
                                         <div>
-                                            <p className="text-xs font-bold text-gray-800 uppercase tracking-wide">
+                                            <p className="text-xs font-bold text-gray-800 dark:text-gray-300 uppercase tracking-wide">
                                                 {format(new Date(apt.start_time), "EEEE, HH:mm", { locale: ptBR }).toUpperCase()}
                                             </p>
-                                            <p className="text-base font-bold text-gray-900 mt-1 leading-tight">{apt.services.name}</p>
+                                            <p className="text-base font-bold text-gray-900 dark:text-white mt-1 leading-tight">{apt.services.name}</p>
                                             <p className="text-xs text-gray-500 mt-1">Com {apt.barbers.name}</p>
                                         </div>
                                         <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">

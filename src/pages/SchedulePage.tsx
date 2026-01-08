@@ -28,13 +28,19 @@ export function SchedulePage() {
 
     const [selectedServiceId, setSelectedServiceId] = useState<string | number | null>(null);
     const [selectedBarberId, setSelectedBarberId] = useState<string | number | null>(null);
-    const [selectedDate, setSelectedDate] = useState<number>(24); // Day of month
+    const [selectedDate, setSelectedDate] = useState<number>(new Date().getDate()); // Day of month
     const [selectedTime, setSelectedTime] = useState<string | null>('09:00');
 
     // Calendar Data
-    const days = Array.from({ length: 31 }, (_, i) => i + 1);
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const startOffset = new Date(currentYear, currentMonth, 1).getDay();
+
+    const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
     const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
-    const startOffset = 1;
 
     useEffect(() => {
         fetchData();
@@ -63,8 +69,7 @@ export function SchedulePage() {
             setServices([
                 { id: 1, name: 'Corte de Cabelo', price: 40 },
                 { id: 2, name: 'Barba', price: 30 },
-                { id: 3, name: 'Corte + Barba', price: 65 },
-                { id: 4, name: 'Pé + Mão Express', price: 60 }
+                { id: 3, name: 'Corte + Barba', price: 65 }
             ]);
             setBarbers([
                 { id: 1, name: 'Jacaré', avatar_url: '/logo_jacare.jpg' }
@@ -168,28 +173,33 @@ export function SchedulePage() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#F5F5F7] pb-24 font-sans">
+        <div className="flex flex-col min-h-screen bg-[#F5F5F7] dark:bg-gray-900 pb-24 font-sans transition-colors duration-300">
             {/* Header */}
             <div className="bg-[#2E5C38] pt-12 p-6 pb-8 flex items-center justify-between shadow-none">
                 <button onClick={() => navigate('/home')} className="text-white">
                     <ArrowLeft size={24} />
                 </button>
                 <h1 className="text-white text-lg font-bold">Novo Agendamento</h1>
-                <Settings className="text-[#D4AF37]" size={24} />
+                <button
+                    onClick={() => navigate('/settings')}
+                    className="p-1 rounded-full hover:bg-white/10 transition-colors"
+                >
+                    <Settings className="text-[#D4AF37]" size={24} />
+                </button>
             </div>
 
             {/* Main Content Card */}
-            <div className="flex-1 bg-[#F5F5F7] px-4 -mt-4 z-10 space-y-4">
+            <div className="flex-1 bg-[#F5F5F7] dark:bg-gray-900 px-4 -mt-4 z-10 space-y-4 transition-colors">
 
                 {/* Services Section */}
-                <div className="bg-white rounded-[20px] p-5 shadow-sm">
-                    <h2 className="text-sm font-bold text-gray-900 mb-4">Escolha o Serviço</h2>
+                <div className="bg-white dark:bg-gray-800 rounded-[20px] p-5 shadow-sm transition-colors">
+                    <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Escolha o Serviço</h2>
 
                     {/* Group 1: Cabelo/Barba */}
                     <div className="relative mb-4">
                         <div className="flex justify-between items-start mb-2">
-                            <span className="font-bold text-gray-900 text-sm">Barba</span>
-                            <div className="w-8 h-8 rounded-full bg-[#E8F5E9] flex items-center justify-center text-[#2E5C38]">
+                            <span className="font-bold text-[#2E5C38] text-sm">Barba</span>
+                            <div className="w-8 h-8 rounded-full bg-[#2E5C38] flex items-center justify-center text-white shadow-sm">
                                 <Scissors size={16} />
                             </div>
                         </div>
@@ -202,10 +212,10 @@ export function SchedulePage() {
                                     className="flex items-center justify-between cursor-pointer hover:bg-gray-50 rounded-lg py-1 transition-colors"
                                 >
                                     <div className="flex flex-col">
-                                        <span className="text-sm font-bold text-gray-900">{service.name}</span>
-                                        <span className="text-xs text-gray-500">{formatPrice(service.price)}</span>
+                                        <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{service.name}</span>
+                                        <span className="text-xs text-gray-500 dark:text-gray-400">{formatPrice(service.price)}</span>
                                     </div>
-                                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedServiceId === service.id ? 'border-[#2E5C38]' : 'border-gray-300'}`}>
+                                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedServiceId === service.id ? 'border-[#2E5C38]' : 'border-gray-300 dark:border-gray-600'}`}>
                                         {selectedServiceId === service.id && <div className="w-2 h-2 rounded-full bg-[#2E5C38]" />}
                                     </div>
                                 </div>
@@ -218,8 +228,8 @@ export function SchedulePage() {
                     {/* Group 2: Combos & Outros */}
                     <div className="relative">
                         <div className="flex justify-between items-start mb-2">
-                            <span className="font-bold text-gray-900 text-sm">Barba</span>
-                            <div className="w-8 h-8 rounded-full bg-[#E8F5E9] flex items-center justify-center text-[#2E5C38]">
+                            <span className="font-bold text-[#2E5C38] text-sm">Outros Serviços</span>
+                            <div className="w-8 h-8 rounded-full bg-[#2E5C38] flex items-center justify-center text-white shadow-sm">
                                 <Scissors size={16} />
                             </div>
                         </div>
@@ -232,10 +242,10 @@ export function SchedulePage() {
                                     className="flex items-center justify-between cursor-pointer hover:bg-gray-50 rounded-lg py-1 transition-colors"
                                 >
                                     <div className="flex flex-col">
-                                        <span className="text-sm font-bold text-gray-900">{service.name}</span>
-                                        <span className="text-xs text-gray-500">{formatPrice(service.price)}</span>
+                                        <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{service.name}</span>
+                                        <span className="text-xs text-gray-500 dark:text-gray-400">{formatPrice(service.price)}</span>
                                     </div>
-                                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedServiceId === service.id ? 'border-[#2E5C38]' : 'border-gray-300'}`}>
+                                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedServiceId === service.id ? 'border-[#2E5C38]' : 'border-gray-300 dark:border-gray-600'}`}>
                                         {selectedServiceId === service.id && <div className="w-2 h-2 rounded-full bg-[#2E5C38]" />}
                                     </div>
                                 </div>
@@ -247,8 +257,8 @@ export function SchedulePage() {
                 </div>
 
                 {/* Professionals Section */}
-                <div className="bg-white rounded-[20px] p-5 shadow-sm">
-                    <h2 className="text-sm font-bold text-gray-900 mb-4">Profissional</h2>
+                <div className="bg-white dark:bg-gray-800 rounded-[20px] p-5 shadow-sm transition-colors">
+                    <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Profissional</h2>
                     <div className="grid grid-cols-2 gap-x-8 gap-y-4">
                         {barbers.map((barber) => (
                             <div
@@ -262,7 +272,7 @@ export function SchedulePage() {
                                         className="w-6 h-6 rounded-full bg-yellow-100 object-cover"
                                         alt={barber.name}
                                     />
-                                    <span className="text-xs font-bold text-gray-900">{barber.name}</span>
+                                    <span className="text-xs font-bold text-gray-900 dark:text-gray-200">{barber.name}</span>
                                 </div>
                                 <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedBarberId === barber.id ? 'border-[#2E5C38]' : 'border-gray-300'}`}>
                                     {selectedBarberId === barber.id && <div className="w-2 h-2 rounded-full bg-[#2E5C38]" />}
@@ -273,8 +283,8 @@ export function SchedulePage() {
                 </div>
 
                 {/* Date & Time Section */}
-                <div className="bg-white rounded-[20px] p-5 shadow-sm">
-                    <h2 className="text-sm font-bold text-gray-900 mb-4">Escolha a Data e Hora</h2>
+                <div className="bg-white dark:bg-gray-800 rounded-[20px] p-5 shadow-sm transition-colors">
+                    <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Escolha a Data e Hora</h2>
 
                     <div className="mb-4">
                         <p className="text-xs text-gray-500 mb-2 capitalize">
@@ -306,7 +316,7 @@ export function SchedulePage() {
                                 onClick={() => setSelectedTime(time)}
                                 className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${selectedTime === time
                                     ? 'bg-[#2E5C38] text-white'
-                                    : 'text-gray-500 border border-gray-200'
+                                    : 'text-gray-500 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                                     }`}
                             >
                                 {time}

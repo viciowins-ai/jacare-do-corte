@@ -31,44 +31,52 @@ import {
 } from './pages/SecondaryPages';
 
 
+import { ThemeProvider } from './contexts/ThemeContext';
+
 export default function App() {
   return (
     <AuthProvider>
-      <HashRouter>
-        <Routes>
-          <Route path="/" element={<Navigate to="/home" replace />} />
+      <ThemeProvider>
+        <HashRouter>
+          <Routes>
+            <Route path="/" element={<Navigate to="/home" replace />} />
 
-          {/* Auth Routes - Public (No Bottom Nav) */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/verify-otp" element={<OTPVerificationPage />} />
-          <Route path="/reset-success" element={<PasswordResetSuccessPage />} />
+            {/* Auth Routes - Public (No Bottom Nav) */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/verify-otp" element={<OTPVerificationPage />} />
+            <Route path="/reset-success" element={<PasswordResetSuccessPage />} />
 
-          {/* App Routes - Protected (With Bottom Nav) */}
-          <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/agendar" element={<SchedulePage />} />
-            <Route path="/perfil" element={<ProfilePage />} />
+            {/* App Routes - Protected (With Bottom Nav) */}
+            <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/agendar" element={<SchedulePage />} />
+              <Route path="/perfil" element={<ProfilePage />} />
 
-            <Route path="/about" element={<AboutAppPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/support" element={<SupportPage />} />
-            <Route path="/rating" element={<RatingPage />} />
-            <Route path="/faq" element={<FAQPage />} />
-            <Route path="/chat" element={<ChatPage />} />
-            <Route path="/report" element={<ReportProblemPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/admin" element={<AdminDashboardPage />} />
-
-            {/* Success Booking might technically be full screen, but usually fits in app flow. 
+              <Route path="/about" element={<AboutAppPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/support" element={<SupportPage />} />
+              <Route path="/rating" element={<RatingPage />} />
+              <Route path="/faq" element={<FAQPage />} />
+              <Route path="/chat" element={<ChatPage />} />
+              <Route path="/report" element={<ReportProblemPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              {/* Success Booking might technically be full screen, but usually fits in app flow. 
                 Screenshot showed no nav? Actually Step 200 Image 2 shows Bottom Nav!
                 So it stays here. */}
-            <Route path="/booking-success" element={<SuccessBookingPage />} />
-          </Route>
+              <Route path="/booking-success" element={<SuccessBookingPage />} />
+            </Route>
 
-        </Routes>
-      </HashRouter>
+            {/* Admin Route - Protected but WITHOUT AppLayout (Custom Nav) */}
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminDashboardPage />
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </HashRouter>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

@@ -44,6 +44,10 @@ export function AdminDashboardPage() {
 
     useEffect(() => {
         fetchAppointments();
+        const savedAutos = localStorage.getItem('admin_automations');
+        if (savedAutos) {
+            setAutomations(JSON.parse(savedAutos));
+        }
     }, []);
 
     const fetchAppointments = async () => {
@@ -109,7 +113,25 @@ export function AdminDashboardPage() {
         const newAutos = [...automations];
         newAutos[index].active = !newAutos[index].active;
         setAutomations(newAutos);
+        localStorage.setItem('admin_automations', JSON.stringify(newAutos));
     }
+
+    const handleAction = async (id: string, action: 'confirm' | 'cancel') => {
+        const newStatus = action === 'confirm' ? 'confirmed' : 'cancelled';
+
+        // 1. Try Supabase
+        try {
+            await supabase.from('appointments').update({ status: newStatus }).eq('id', id);
+        } catch (e) { console.log('Supabase update failed, using local'); }
+
+        // 2. Try MockDB
+        MockDB.updateAppointment(id, { status: newStatus });
+
+        // 3. Update Local State UI
+        setAppointments(prev => prev.map(a =>
+            a.id === id ? { ...a, status: newStatus } : a
+        ));
+    };
 
     const todayList = appointments.filter(a => isSameDay(parseISO(a.start_time), new Date()));
 
@@ -222,11 +244,21 @@ export function AdminDashboardPage() {
                                         >
                                             <MessageCircle size={18} />
                                         </a>
-                                        <button className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition-colors">
+                                        <button
+                                            onClick={() => handleAction(apt.id, 'confirm')}
+                                            className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${apt.status === 'confirmed' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
+                                            title="Confirmar Presença"
+                                        >
                                             <Check size={18} />
                                         </button>
-                                        <button className="w-9 h-9 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-gray-100 transition-colors">
-                                            <MoreHorizontal size={18} />
+                                        <button
+                                            onClick={() => {
+                                                if (confirm('Cancelar agendamento?')) handleAction(apt.id, 'cancel');
+                                            }}
+                                            className="w-9 h-9 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors"
+                                            title="Cancelar"
+                                        >
+                                            <MoreHorizontal size={18} className="rotate-90" />
                                         </button>
                                     </div>
                                 </div>

@@ -1,5 +1,5 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { User, PlayCircle, Monitor } from 'lucide-react';
+import { Home, CalendarPlus, User } from 'lucide-react';
 import clsx from 'clsx';
 
 export function AppLayout() {
@@ -10,9 +10,9 @@ export function AppLayout() {
     const showBottomNav = location.pathname !== '/agendar';
 
     return (
-        <div className="flex flex-col h-screen bg-[#F5F5F7] max-w-md mx-auto shadow-2xl overflow-hidden relative">
-            {/* Content Area */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide pb-20">
+        <div className="flex flex-col h-screen bg-[#F5F5F7] dark:bg-gray-900 max-w-md mx-auto shadow-2xl overflow-hidden relative transition-colors duration-300">
+            {/* Content Area - Increased padding to avoid nav overlap */}
+            <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide pb-32">
                 <Outlet />
             </div>
 
@@ -26,7 +26,7 @@ export function AppLayout() {
                             isActive('/home') ? "text-[#D4AF37] translate-y-[-2px]" : "text-white/70 hover:text-white"
                         )}
                     >
-                        <User size={26} strokeWidth={isActive('/home') ? 2.5 : 2} />
+                        <Home size={26} strokeWidth={isActive('/home') ? 2.5 : 2} />
                         <span className={clsx("text-[11px] font-medium tracking-wide", isActive('/home') ? "opacity-100" : "opacity-80")}>Início</span>
                     </button>
 
@@ -37,7 +37,7 @@ export function AppLayout() {
                             isActive('/agendar') ? "text-[#D4AF37] translate-y-[-2px]" : "text-white/70 hover:text-white"
                         )}
                     >
-                        <PlayCircle size={26} strokeWidth={isActive('/agendar') ? 2.5 : 2} />
+                        <CalendarPlus size={26} strokeWidth={isActive('/agendar') ? 2.5 : 2} />
                         <span className={clsx("text-[11px] font-medium tracking-wide", isActive('/agendar') ? "opacity-100" : "opacity-80")}>Agendar</span>
                     </button>
 
@@ -48,7 +48,7 @@ export function AppLayout() {
                             isActive('/perfil') ? "text-[#D4AF37] translate-y-[-2px]" : "text-white/70 hover:text-white"
                         )}
                     >
-                        <Monitor size={26} strokeWidth={isActive('/perfil') ? 2.5 : 2} />
+                        <User size={26} strokeWidth={isActive('/perfil') ? 2.5 : 2} />
                         <span className={clsx("text-[11px] font-medium tracking-wide", isActive('/perfil') ? "opacity-100" : "opacity-80")}>Perfil</span>
                     </button>
                 </nav>
