@@ -23,11 +23,31 @@ export function LoginPage() {
         setError(null);
 
         try {
-            const { error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
+            const isEmail = email.includes('@');
+            let res;
 
+            if (isEmail) {
+                res = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                });
+            } else {
+                // Format Phone to E.164
+                let formattedPhone = email.replace(/\D/g, '');
+                if (formattedPhone.length === 10 || formattedPhone.length === 11) {
+                    formattedPhone = '55' + formattedPhone;
+                }
+                if (!formattedPhone.startsWith('+')) {
+                    formattedPhone = '+' + formattedPhone;
+                }
+
+                res = await supabase.auth.signInWithPassword({
+                    phone: formattedPhone,
+                    password,
+                });
+            }
+
+            const { error } = res;
             if (error) throw error;
             navigate('/home');
         } catch (err: any) {

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, MessageCircle, HelpCircle, Settings, AlertTriangle, ChevronRight, Star, Send, FileText, User, Disc, LayoutGrid, MonitorSmartphone } from 'lucide-react';
 import clsx from 'clsx';
+import { useAuth } from '../contexts/AuthContext';
 
 // ... (Existing pages like OTP, PasswordReset, About, Settings, Support - keeping them similar but refining styles if needed)
 
@@ -11,7 +12,7 @@ function BottomNav({ active }: { active?: string }) {
     const isActive = (path: string) => active === path;
 
     return (
-        <nav className="absolute bottom-0 w-full h-[70px] bg-[#374151] rounded-t-[20px] flex items-center justify-around px-2 z-50">
+        <nav className="absolute bottom-0 w-full h-[70px] bg-[#2C2C2C] rounded-t-[20px] flex items-center justify-around px-2 z-50">
             <button onClick={() => navigate('/home')} className={clsx("flex flex-col items-center justify-center w-16 gap-1", isActive('/home') ? "text-[#D4AF37]" : "text-white/70 hover:text-white")}>
                 <User size={26} strokeWidth={isActive('/home') ? 2.5 : 2} />
                 <span className={clsx("text-[11px] font-medium tracking-wide", isActive('/home') ? "opacity-100" : "opacity-80")}>Início</span>
@@ -34,8 +35,11 @@ import { useLocation } from 'react-router-dom';
 export function OTPVerificationPage() {
     const navigate = useNavigate();
     const location = useLocation();
-    const email = location.state?.email || 'seu-email@exemplo.com';
-    const [otp, setOtp] = useState(['', '', '', '', '', '']);
+    const email = location.state?.email;
+    const phone = location.state?.phone;
+    const target = phone || email || 'seu contato';
+
+    const [otp, setOtp] = useState(['', '', '', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -56,7 +60,8 @@ export function OTPVerificationPage() {
         setOtp(newOtp);
 
         // Move to next input
-        if (value !== '' && index < 5) {
+        // Move to next input
+        if (value !== '' && index < otp.length - 1) {
             inputRefs.current[index + 1]?.focus();
         }
     };
@@ -70,8 +75,8 @@ export function OTPVerificationPage() {
 
     const handleVerify = async () => {
         const code = otp.join('');
-        if (code.length !== 6) {
-            setError('Por favor, preencha todos os dígitos.');
+        if (code.length < 6) {
+            setError('Por favor, preencha o código completo.');
             return;
         }
 
@@ -79,11 +84,25 @@ export function OTPVerificationPage() {
         setError(null);
 
         try {
-            const { error } = await supabase.auth.verifyOtp({
-                email,
-                token: code,
-                type: 'signup'
-            });
+            let error;
+
+            if (phone) {
+                // Verify Phone OTP
+                const res = await supabase.auth.verifyOtp({
+                    phone: phone,
+                    token: code,
+                    type: 'sms'
+                });
+                error = res.error;
+            } else {
+                // Verify Email OTP
+                const res = await supabase.auth.verifyOtp({
+                    email: email,
+                    token: code,
+                    type: 'signup'
+                });
+                error = res.error;
+            }
 
             if (error) throw error;
 
@@ -97,12 +116,23 @@ export function OTPVerificationPage() {
 
     const handleResend = async () => {
         try {
-            const { error } = await supabase.auth.resend({
-                type: 'signup',
-                email: email
-            });
+            let error;
+            if (phone) {
+                const res = await supabase.auth.resend({
+                    type: 'sms',
+                    phone: phone
+                });
+                error = res.error;
+            } else {
+                const res = await supabase.auth.resend({
+                    type: 'signup',
+                    email: email
+                });
+                error = res.error;
+            }
+
             if (error) throw error;
-            alert('Código reenviado para seu e-mail!');
+            alert(`Código reenviado para ${phone ? 'seu WhatsApp/SMS' : 'seu e-mail'}!`);
         } catch (err: any) {
             alert('Erro ao reenviar código: ' + err.message);
         }
@@ -127,10 +157,10 @@ export function OTPVerificationPage() {
                     <img src="/logo_jacare.jpg" alt="Logo" className="w-full h-full object-cover scale-110" />
                 </div>
 
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Verifique seu E-mail</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Verifique seu Código</h2>
                 <p className="text-center text-gray-500 mb-8 text-sm max-w-xs">
-                    Enviamos um código de 6 dígitos para <br />
-                    <span className="font-medium text-gray-700">{email}</span>
+                    Enviamos o código para <br />
+                    <span className="font-medium text-gray-700">{target}</span>
                 </p>
 
                 {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
@@ -146,25 +176,41 @@ export function OTPVerificationPage() {
                             value={digit}
                             onChange={(e) => handleChange(i, e.target.value)}
                             onKeyDown={(e) => handleKeyDown(i, e)}
-                            className="w-12 h-14 border border-gray-300 rounded-xl bg-gray-50 flex items-center justify-center text-xl font-bold text-gray-800 shadow-sm text-center focus:border-[#2E5C38] focus:ring-1 focus:ring-[#2E5C38] outline-none transition-all"
+                            className="w-9 h-12 border border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center text-lg font-bold text-gray-800 shadow-sm text-center focus:border-[#2E5C38] focus:ring-1 focus:ring-[#2E5C38] outline-none transition-all"
                         />
                     ))}
                 </div>
 
-                <button
-                    onClick={handleVerify}
-                    disabled={loading}
-                    className="w-full h-14 bg-[#2E5C38] text-white font-bold rounded-full shadow-lg mb-6 text-lg hover:bg-[#1E3F24] transition-colors disabled:opacity-70 flex items-center justify-center"
-                >
-                    {loading ? 'Verificando...' : 'Confirmar Código'}
-                </button>
+                <div className="w-full space-y-4">
+                    <button
+                        onClick={handleVerify}
+                        disabled={loading}
+                        className="w-full h-12 bg-[#3E6D48] text-white font-bold rounded-full shadow-lg text-lg hover:bg-[#2E5C38] transition-colors disabled:opacity-70 flex items-center justify-center"
+                    >
+                        {loading ? 'Verificando...' : 'Confirmar Código'}
+                    </button>
 
-                <button onClick={handleResend} className="text-gray-500 text-sm font-medium hover:text-[#2E5C38] transition-colors">
-                    Reenviar código
-                </button>
+                    <button onClick={handleResend} className="w-full text-center text-gray-500 text-sm font-medium hover:text-[#2E5C38] transition-colors pb-4">
+                        Reenviar código
+                    </button>
+                </div>
             </div>
 
-            <BottomNav />
+            {/* Bottom Navigation (Visual Only for this screen as user is not logged in) */}
+            <nav className="fixed bottom-0 w-full h-[70px] bg-[#2C2C2C] flex items-center justify-around px-2 z-50 rounded-t-3xl pb-2">
+                <button className="flex flex-col items-center justify-center w-16 gap-1 text-white/50">
+                    <User size={24} />
+                    <span className="text-[10px] font-medium tracking-wide">Início</span>
+                </button>
+                <button className="flex flex-col items-center justify-center w-16 gap-1 text-white/50">
+                    <Disc size={24} />
+                    <span className="text-[10px] font-medium tracking-wide">Agendar</span>
+                </button>
+                <button className="flex flex-col items-center justify-center w-16 gap-1 text-white/50">
+                    <LayoutGrid size={24} />
+                    <span className="text-[10px] font-medium tracking-wide">Perfil</span>
+                </button>
+            </nav>
         </div>
     );
 }
@@ -620,6 +666,7 @@ import { useTheme } from '../contexts/ThemeContext';
 
 export function SettingsPage() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const { darkMode, toggleDarkMode } = useTheme();
 
     // Initialize state for notifications
@@ -705,18 +752,20 @@ export function SettingsPage() {
                 </div>
 
                 {/* Admin Access - Professional Area */}
-                <div onClick={() => navigate('/admin')} className="mx-8 mb-4 bg-gradient-to-r from-[#1F2937] to-[#111827] rounded-xl p-4 flex items-center justify-between cursor-pointer shadow-lg border border-[#D4AF37]/30">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#D4AF37] flex items-center justify-center text-[#1F2937]">
-                            <LayoutGrid size={20} />
+                {user?.email === 'viciowins@gmail.com' && (
+                    <div onClick={() => navigate('/admin')} className="mx-8 mb-4 bg-gradient-to-r from-[#1F2937] to-[#111827] rounded-xl p-4 flex items-center justify-between cursor-pointer shadow-lg border border-[#D4AF37]/30">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-[#D4AF37] flex items-center justify-center text-[#1F2937]">
+                                <LayoutGrid size={20} />
+                            </div>
+                            <div>
+                                <p className="text-white font-bold text-sm">Área do Profissional</p>
+                                <p className="text-gray-400 text-xs">Gerenciar agendamentos</p>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-white font-bold text-sm">Área do Profissional</p>
-                            <p className="text-gray-400 text-xs">Gerenciar agendamentos</p>
-                        </div>
+                        <ChevronRight className="text-[#D4AF37]" size={20} />
                     </div>
-                    <ChevronRight className="text-[#D4AF37]" size={20} />
-                </div>
+                )}
 
                 {/* Logout Button */}
                 <div className="px-8">

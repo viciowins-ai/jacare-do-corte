@@ -26,13 +26,23 @@ export function RegisterPage() {
         }
 
         try {
+            // Format Phone to E.164 (Metadata only)
+            let formattedPhone = phone.replace(/\D/g, '');
+            if (formattedPhone.length === 10 || formattedPhone.length === 11) {
+                formattedPhone = '55' + formattedPhone;
+            }
+            if (formattedPhone.length > 0 && !formattedPhone.startsWith('+')) {
+                formattedPhone = '+' + formattedPhone;
+            }
+
+            // Register using EMAIL as primary auth
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
                     data: {
                         full_name: fullName,
-                        phone: phone,
+                        phone: formattedPhone, // Save phone in metadata
                     },
                 },
             });
@@ -42,13 +52,15 @@ export function RegisterPage() {
             if (data.session) {
                 navigate('/home');
             } else {
-                // Se não houver sessão, significa que o email precisa de confirmação
-                // Navega para a tela de OTP passando o email
+                // Navigate to OTP page passing email for verification context
                 navigate('/verify-otp', { state: { email } });
             }
 
         } catch (err: any) {
-            setError(err.message || 'Erro ao criar conta.');
+            console.error(err);
+            setError(err.message && err.message.includes('already registered')
+                ? 'Este e-mail já está cadastrado. Tente fazer login.'
+                : err.message || 'Erro ao criar conta.');
         } finally {
             setLoading(false);
         }
