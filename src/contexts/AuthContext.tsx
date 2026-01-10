@@ -37,10 +37,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setLoading(false);
         });
 
-        return () => subscription.unsubscribe();
+        // Demo Mode Handler
+        const checkDemo = () => {
+            const isDemo = localStorage.getItem('demo_mode') === 'true';
+            if (isDemo && !session) {
+                const demoUser: any = {
+                    id: 'demo-user-123',
+                    email: 'visitante@jacare.com',
+                    user_metadata: { full_name: 'Visitante', avatar_url: null }
+                };
+                setUser(demoUser);
+                setSession({ user: demoUser } as any);
+                setLoading(false);
+            }
+        };
+        checkDemo();
+        window.addEventListener('storage', checkDemo);
+
+        return () => {
+            subscription.unsubscribe();
+            window.removeEventListener('storage', checkDemo);
+        };
     }, []);
 
     const signOut = async () => {
+        localStorage.removeItem('demo_mode');
+        // Force reload to clear context state effectively if relying on internal state
+        if (localStorage.getItem('demo_mode') === null) {
+            setSession(null);
+            setUser(null);
+        }
         await supabase.auth.signOut();
     };
 

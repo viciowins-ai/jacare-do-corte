@@ -118,6 +118,19 @@ export function LoginPage() {
                     </button>
                 </form>
 
+                <div className="w-full mt-4">
+                    <button
+                        onClick={() => {
+                            localStorage.setItem('demo_mode', 'true');
+                            window.dispatchEvent(new Event('storage'));
+                            navigate('/home');
+                        }}
+                        className="w-full h-12 bg-transparent border-2 border-[#D4AF37] text-[#D4AF37] font-bold rounded-xl hover:bg-[#D4AF37] hover:text-white transition-all text-base"
+                    >
+                        Entrar como Visitante
+                    </button>
+                </div>
+
                 <div className="mt-8 text-center">
                     <span className="text-gray-600 text-sm">Não tem conta? </span>
                     <Link to="/register" className="text-[#D4AF37] font-bold text-sm hover:underline">Cadastre-se</Link>
