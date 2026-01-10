@@ -28,6 +28,7 @@ export function ProfilePage() {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [appointments, setAppointments] = useState<Appointment[]>([]);
+    const [selectedPayment, setSelectedPayment] = useState<'pix' | 'card'>('pix');
 
     useEffect(() => {
         loadHistory();
@@ -182,9 +183,18 @@ export function ProfilePage() {
                     </div>
                     <div className="space-y-3">
                         {/* Pix Option */}
-                        <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-100 dark:border-green-800/30">
+                        <div
+                            onClick={() => setSelectedPayment('pix')}
+                            className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${selectedPayment === 'pix'
+                                ? 'bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800/30'
+                                : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700'
+                                }`}
+                        >
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 bg-green-200 rounded-full flex items-center justify-center text-green-700">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${selectedPayment === 'pix'
+                                    ? 'bg-green-200 text-green-700'
+                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                                    }`}>
                                     <QrCode size={16} />
                                 </div>
                                 <div>
@@ -192,12 +202,27 @@ export function ProfilePage() {
                                     <span className="text-xs text-green-600 dark:text-green-400">Recomendado</span>
                                 </div>
                             </div>
-                            <div className="w-4 h-4 rounded-full border-2 border-green-500 bg-green-500"></div>
+                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${selectedPayment === 'pix'
+                                ? 'border-green-500 bg-green-500'
+                                : 'border-gray-300 dark:border-gray-500'
+                                }`}>
+                                {selectedPayment === 'pix' && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                            </div>
                         </div>
 
-                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                        {/* Credit Card Option */}
+                        <div
+                            onClick={() => setSelectedPayment('card')}
+                            className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${selectedPayment === 'card'
+                                ? 'bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800/30'
+                                : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700'
+                                }`}
+                        >
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${selectedPayment === 'card'
+                                    ? 'bg-green-200 text-green-700'
+                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                                    }`}>
                                     <CreditCard size={16} />
                                 </div>
                                 <div>
@@ -205,8 +230,16 @@ export function ProfilePage() {
                                     <span className="text-xs text-gray-500 dark:text-gray-400">Pagamento na loja</span>
                                 </div>
                             </div>
-                            <div className="text-xs font-medium bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-md">
-                                Presencial
+                            <div className="flex items-center gap-3">
+                                <span className="text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-md">
+                                    Presencial
+                                </span>
+                                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${selectedPayment === 'card'
+                                    ? 'border-green-500 bg-green-500'
+                                    : 'border-gray-300 dark:border-gray-500'
+                                    }`}>
+                                    {selectedPayment === 'card' && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                                </div>
                             </div>
                         </div>
                     </div>
