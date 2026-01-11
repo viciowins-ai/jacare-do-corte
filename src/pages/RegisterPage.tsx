@@ -58,9 +58,11 @@ export function RegisterPage() {
 
         } catch (err: any) {
             console.error(err);
-            setError(err.message && err.message.includes('already registered')
-                ? 'Este e-mail já está cadastrado. Tente fazer login.'
-                : err.message || 'Erro ao criar conta.');
+            let msg = err.message || 'Erro ao criar conta.';
+            if (msg.includes('already registered')) msg = 'Este e-mail já está cadastrado. Tente fazer login.';
+            if (msg.includes('Password should be at least')) msg = 'A senha deve ter pelo menos 6 caracteres.';
+            if (msg.includes('invalid claim')) msg = 'Erro no token de verificação. Tente novamente.';
+            setError(msg);
         } finally {
             setLoading(false);
         }

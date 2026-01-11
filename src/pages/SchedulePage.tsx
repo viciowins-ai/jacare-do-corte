@@ -333,7 +333,7 @@ export function SchedulePage() {
                     className="flex flex-col items-center justify-center gap-1 text-white/70 hover:text-white transition-colors"
                 >
                     <User size={24} strokeWidth={2} />
-                    <span className="text-[10px] font-medium tracking-wide opacity-80">Inicio</span>
+                    <span className="text-[10px] font-medium tracking-wide opacity-80">Início</span>
                 </button>
 
                 <button

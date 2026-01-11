@@ -51,7 +51,10 @@ export function LoginPage() {
             if (error) throw error;
             navigate('/home');
         } catch (err: any) {
-            setError(err.message || 'Erro ao entrar. Verifique suas credenciais.');
+            let msg = err.message || 'Erro ao entrar. Verifique suas credenciais.';
+            if (msg === 'Invalid login credentials') msg = 'Credenciais inválidas. Verifique seu e-mail e senha.';
+            if (msg.includes('Email not confirmed')) msg = 'E-mail não confirmado. Verifique sua caixa de entrada.';
+            setError(msg);
         } finally {
             setLoading(false);
         }
@@ -62,7 +65,7 @@ export function LoginPage() {
             {/* Top Header Section */}
             <div className="bg-[#2E5C38] pt-12 pb-6 px-6 rounded-b-[30px] shadow-lg flex flex-col items-center relative z-10">
                 <div className="w-full flex justify-center mb-2">
-                    <span className="text-white text-lg font-bold">Login</span>
+                    <span className="text-white text-lg font-bold">Entrar</span>
                 </div>
 
                 <div className="w-32 h-32 bg-black rounded-full border-[3px] border-[#D4AF37] flex items-center justify-center overflow-hidden mb-4 shadow-xl">

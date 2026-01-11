@@ -29,9 +29,9 @@ interface AdminAppointment {
 
 // Mock automation settings
 const MOCK_AUTOMATIONS = [
-    { title: 'Lembrete via WhatsApp (1h antes)', active: true, desc: 'Envia mensagem automática para o cliente.' },
-    { title: 'Confirmação Automática', active: true, desc: 'Confirma agendamentos pagos via PIX automaticamente.' },
-    { title: 'Solicitação de Avaliação', active: false, desc: 'Pede feedback ao cliente após o serviço.' }
+    { title: 'Lembrete via E-mail (Diário às 8h)', active: true, desc: 'Envia e-mail automático para clientes com agendamento no dia.' },
+    { title: 'Confirmação Automática', active: false, desc: 'Confirma agendamentos pagos via PIX automaticamente. (Em breve)' },
+    { title: 'Solicitação de Avaliação', active: false, desc: 'Pede feedback ao cliente após o serviço. (Em breve)' }
 ];
 
 export function AdminDashboardPage() {
