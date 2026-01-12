@@ -11,6 +11,7 @@ import { SchedulePage } from './pages/SchedulePage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SuccessBookingPage } from './pages/SuccessBookingPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
+import { PaymentPage } from './pages/PaymentPage';
 
 // Secondary Pages (Placeholder for now, mapped to Support/About/Settings if they exist or fallback)
 // Assuming SecondaryPages.tsx exists or we might need to create placeholders if they break build.
@@ -46,6 +47,13 @@ export default function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/verify-otp" element={<OTPVerificationPage />} />
             <Route path="/reset-success" element={<PasswordResetSuccessPage />} />
+
+            {/* Payment Route - Protected, Full Screen (No Nav) */}
+            <Route path="/payment" element={
+              <ProtectedRoute>
+                <PaymentPage />
+              </ProtectedRoute>
+            } />
 
             {/* App Routes - Protected (With Bottom Nav) */}
             <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>

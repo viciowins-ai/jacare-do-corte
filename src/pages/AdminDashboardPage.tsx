@@ -40,7 +40,7 @@ export function AdminDashboardPage() {
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({ todayCount: 0, todayRevenue: 0 });
     const [automations, setAutomations] = useState(MOCK_AUTOMATIONS);
-    const [activeTab, setActiveTab] = useState<'daily' | 'automations'>('daily');
+    const [activeTab, setActiveTab] = useState<'daily' | 'automations' | 'pending_users'>('daily');
     const [showNotifications, setShowNotifications] = useState(false);
     const [showCustomers, setShowCustomers] = useState(false);
 
@@ -72,7 +72,22 @@ export function AdminDashboardPage() {
     }, []);
 
     const fetchAppointments = async () => {
-        // ... (unchanged)
+        setLoading(true);
+        // Simulate fetch
+        setTimeout(() => {
+            const data: any[] = MockDB.getAppointments();
+            // Transform mock data to AdminAppointment structure if needed, or cast
+            // For now, we assume the structure matches enough or we cast
+            setAppointments(data as AdminAppointment[]);
+
+            // Mock Stats
+            setStats({
+                todayCount: data.filter(a => isSameDay(parseISO(a.start_time), new Date())).length,
+                todayRevenue: data.filter(a => isSameDay(parseISO(a.start_time), new Date())).reduce((acc, curr) => acc + (curr.services?.price || 0), 0)
+            });
+
+            setLoading(false);
+        }, 500);
     };
 
     // ...
@@ -221,6 +236,12 @@ export function AdminDashboardPage() {
                         Agenda
                     </button>
                     <button
+                        onClick={() => setActiveTab('pending_users')}
+                        className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${activeTab === 'pending_users' ? 'bg-[#1F2937] text-white shadow-md' : 'text-gray-500'}`}
+                    >
+                        Pagamentos
+                    </button>
+                    <button
                         onClick={() => setActiveTab('automations')}
                         className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${activeTab === 'automations' ? 'bg-[#1F2937] text-white shadow-md' : 'text-gray-500'}`}
                     >
@@ -296,6 +317,44 @@ export function AdminDashboardPage() {
                             ))
                         )}
                     </>
+                )}
+
+                {activeTab === 'pending_users' && (
+                    <div className="space-y-4">
+                        <div className="bg-yellow-50 border border-yellow-100 p-4 rounded-xl flex items-start gap-3">
+                            <div className="bg-yellow-100 text-yellow-600 p-2 rounded-lg">
+                                <DollarSign size={20} />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-gray-900 text-sm">Aprovar Pagamentos</h3>
+                                <p className="text-xs text-gray-500 leading-relaxed mt-1">
+                                    Confira se o PIX caiu na sua conta e libere o acesso dos usuários abaixo.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* List of Mock Pending Users (In real app, fetch from DB) */}
+                        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                            {/* Since we don't have a backend to list all users, we'll fake one pending user for demo purposes if none exist */}
+                            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 font-bold">
+                                        N
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-gray-900 text-sm">Novo Usuário (Demo)</p>
+                                        <p className="text-xs text-gray-400">aguardando liberação...</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => alert('Usuário Demonstrativo Aprovado! (Em produção, isso atualizaria o banco de dados)')}
+                                    className="bg-green-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-md hover:bg-green-700 transition-colors"
+                                >
+                                    Aprovar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 )}
 
                 {activeTab === 'automations' && (

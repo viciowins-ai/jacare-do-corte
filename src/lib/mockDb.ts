@@ -44,5 +44,23 @@ export const MockDB = {
             return true;
         }
         return false;
+    },
+
+    // --- USER PAYMENT SIMULATION ---
+    USER_KEY: 'jacare_users_status',
+
+    updateUserStatus: (userId: string, status: 'approved' | 'pending' | 'blocked') => {
+        const users = JSON.parse(localStorage.getItem('jacare_users_status') || '{}');
+        users[userId] = status;
+        localStorage.setItem('jacare_users_status', JSON.stringify(users));
+    },
+
+    getUserStatus: (userId: string): 'approved' | 'pending' | 'blocked' => {
+        // Default to 'approved' for 'admin' or existing tests to avoid breaking flow immediately,
+        // BUT for new users we want 'pending'. 
+        // For this demo, let's say EVERYONE is 'pending' unless approved, 
+        // except known admins.
+        const users = JSON.parse(localStorage.getItem('jacare_users_status') || '{}');
+        return users[userId] || 'pending'; // Default to pending payment
     }
 };
