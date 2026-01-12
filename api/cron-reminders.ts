@@ -20,15 +20,16 @@ export default async function handler(req, res) {
     try {
         console.log('[CRON] Checking for appointments to remind...');
 
-        // 2. Define Time Window (The Whole Day)
-        // Since we run once a day at 8:00 AM, we look for anything scheduled today until midnight.
+        // 2. Define Time Window (1 Hour from now)
+        // Cron runs hourly. We look for appointments starting in roughly 1 hour (50-70 min window)
         const now = new Date();
-        const endOfDay = new Date(now);
-        endOfDay.setHours(23, 59, 59, 999);
+
+        const startWindow = new Date(now.getTime() + 50 * 60000); // +50 mins
+        const endWindow = new Date(now.getTime() + 70 * 60000);   // +70 mins
 
         // ISO Strings for DB query
-        const startRange = now.toISOString();
-        const endRange = endOfDay.toISOString();
+        const startRange = startWindow.toISOString();
+        const endRange = endWindow.toISOString();
 
         // 3. Query Appointments
         // We need appointments that:
@@ -67,10 +68,10 @@ export default async function handler(req, res) {
             const message = `
                 Olá! Lembrete do Jacaré do Corte 🐊
                 
-                Seu agendamento para *${(apt as any).services?.[0]?.name || 'serviço'}* com *${(apt as any).barbers?.[0]?.name || 'profissional'}* é hoje.
+                Seu agendamento para *${(apt as any).services?.[0]?.name || 'serviço'}* com *${(apt as any).barbers?.[0]?.name || 'profissional'}* começa em breve!
                 Horário: ${new Date(apt.start_time).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                 
-                Te esperamos lá!
+                Nos vemos em 1 hora!
             `;
 
             // B. Send Email 

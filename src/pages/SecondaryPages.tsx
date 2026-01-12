@@ -132,7 +132,7 @@ export function OTPVerificationPage() {
             }
 
             if (error) throw error;
-            alert(`Código reenviado para ${phone ? 'seu WhatsApp/SMS' : 'seu e-mail'}!`);
+            alert(`Código reenviado para ${phone ? 'seu e-mail' : 'seu e-mail'}!`);
         } catch (err: any) {
             alert('Erro ao reenviar código: ' + err.message);
         }
@@ -575,9 +575,9 @@ export function ReportProblemPage() {
                         <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jessica" alt="Support" className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1">
-                        <h3 className="font-bold text-gray-900 text-sm">Cham Suporte</h3>
+                        <h3 className="font-bold text-gray-900 text-sm">Falar com Suporte</h3>
                         <p className="text-xs text-gray-500 leading-tight mt-0.5">
-                            Atendimento disponível para dúvidas sobre serviços com Sr. Zeca.
+                            Atendimento disponível para dúvidas sobre serviços.
                         </p>
                     </div>
                     {/* Toggle */}
@@ -641,7 +641,7 @@ export function ReportProblemPage() {
                             <img src="/images/articles/placeholder_3.jpg" onError={(e) => e.currentTarget.src = 'https://placehold.co/100x100/2E5C38/FFFFFF?text=S'} alt="Thumb" className="w-full h-full object-cover" />
                         </div>
                         <div className="flex-1">
-                            <h3 className="text-xs font-bold text-gray-900 mb-0.5">Levra ascia decrin a pismde</h3>
+                            <h3 className="text-xs font-bold text-gray-900 mb-0.5">Dicas de cuidados pós-corte</h3>
                             <p className="text-[10px] text-gray-400">Artigo</p>
                         </div>
                         <ChevronRight size={18} className="text-gray-300" />
@@ -651,7 +651,7 @@ export function ReportProblemPage() {
                             <img src="/images/articles/placeholder_4.jpg" onError={(e) => e.currentTarget.src = 'https://placehold.co/100x100/2E5C38/FFFFFF?text=O'} alt="Thumb" className="w-full h-full object-cover" />
                         </div>
                         <div className="flex-1">
-                            <h3 className="text-xs font-bold text-gray-900 mb-0.5">Olá, torsar desceiel pragne</h3>
+                            <h3 className="text-xs font-bold text-gray-900 mb-0.5">Como ganhar descontos?</h3>
                             <p className="text-[10px] text-gray-400">Ajuda</p>
                         </div>
                         <ChevronRight size={18} className="text-gray-300" />
@@ -699,8 +699,8 @@ export function SettingsPage() {
 
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="font-bold text-gray-800 dark:text-gray-200 text-base">Notificações</p>
-                                    <p className="text-sm text-gray-500">Receber novidades</p>
+                                    <p className="font-bold text-gray-800 dark:text-gray-200 text-base">Lembretes via E-mail</p>
+                                    <p className="text-sm text-gray-500">Receber avisos de agendamento</p>
                                 </div>
 
                                 {/* Toggle */}
