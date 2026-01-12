@@ -32,7 +32,7 @@ export function PaymentPage() {
 
         // Redirect to WhatsApp with pre-filled message
         const message = `Olá! Acabei de fazer o PIX de R$ ${APP_PRICE} para liberar meu acesso no App Jacaré do Corte. Meu email é: ${user?.email}`;
-        const whatsappLink = `https://wa.me/5511999999999?text=${encodeURIComponent(message)}`;
+        const whatsappLink = `https://wa.me/554199904961?text=${encodeURIComponent(message)}`;
 
         // Open WhatsApp in new tab
         window.open(whatsappLink, '_blank');
