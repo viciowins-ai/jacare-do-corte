@@ -1,4 +1,4 @@
-#Mon Jan 12 16:27:58 BRT 2026
+#Mon Jan 12 23:17:54 BRT 2026
 base.0=C\:\\Users\\humbe\\.gemini\\antigravity\\scratch\\jacare-do-corte\\android-twa\\app\\build\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
 renamed.0=classes.dex
 path.0=classes.dex
