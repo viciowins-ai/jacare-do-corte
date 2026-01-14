@@ -596,7 +596,7 @@ export function ReportProblemPage() {
                             <img src="/images/articles/placeholder_1.jpg" onError={(e) => e.currentTarget.src = 'https://placehold.co/100x100/2E5C38/FFFFFF?text=D'} alt="Thumb" className="w-full h-full object-cover" />
                         </div>
                         <div className="flex-1">
-                            <h3 className="text-xs font-bold text-gray-900 mb-0.5">Dúvidas sobre pagamentos e unhas</h3>
+                            <h3 className="text-xs font-bold text-gray-900 mb-0.5">Dúvidas sobre ativação e agendamento</h3>
                             <p className="text-[10px] text-gray-400">Guia rápido</p>
                         </div>
                         <ChevronRight size={18} className="text-gray-300" />
@@ -852,7 +852,7 @@ export function SupportPage() {
                             <MessageCircle size={22} className="stroke-[1.5px]" />
                         </div>
                         <div className="flex-1">
-                            <h3 className="font-bold text-sm text-gray-900 mb-0.5 group-hover:text-[#2E5C38] transition-colors">Dúvidas sobre Pagamentos</h3>
+                            <h3 className="font-bold text-sm text-gray-900 mb-0.5 group-hover:text-[#2E5C38] transition-colors">Dúvidas sobre Acesso</h3>
                         </div>
                         <ChevronRight size={20} className="text-gray-300" />
                     </button>
@@ -965,7 +965,7 @@ export function PrivacyPage() {
 
                     <div>
                         <h3 className="font-bold text-gray-900 mb-2">Uso da Informação</h3>
-                        <p className="text-xs text-gray-500 leading-relaxed text-justify">Utilizamos suas informações para gerenciar seus agendamentos, enviar lembretes importantes, processar pagamentos com segurança e comunicar novidades ou promoções exclusivas, sempre respeitando suas preferências de comunicação.</p>
+                        <p className="text-xs text-gray-500 leading-relaxed text-justify">Utilizamos suas informações para gerenciar seus agendamentos, enviar lembretes importantes, processar ativações de conta com segurança e comunicar novidades ou promoções exclusivas, sempre respeitando suas preferências de comunicação.</p>
                     </div>
 
                     <div>

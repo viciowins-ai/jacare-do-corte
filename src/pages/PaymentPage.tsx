@@ -54,13 +54,13 @@ export function PaymentPage() {
 
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">Libere seu Acesso</h1>
                 <p className="text-gray-500 mb-6 leading-relaxed">
-                    Para agendar cortes e acessar recursos exclusivos, adquira sua licença vitalícia do aplicativo.
+                    Para agendar cortes e acessar recursos exclusivos, ative seu acesso vitalício ao aplicativo.
                 </p>
 
                 <div className="bg-green-50 rounded-2xl p-6 mb-6 border border-green-100">
-                    <p className="text-sm text-[#2E5C38] font-bold uppercase tracking-wider mb-1">Valor Único</p>
+                    <p className="text-sm text-[#2E5C38] font-bold uppercase tracking-wider mb-1">Valor de Ativação</p>
                     <p className="text-4xl font-black text-[#2E5C38]">R$ {APP_PRICE}</p>
-                    <p className="text-xs text-green-600 mt-2 font-medium">Sem mensalidades. Pague uma vez, use para sempre.</p>
+                    <p className="text-xs text-green-600 mt-2 font-medium">Sem mensalidades. Ative uma vez, use para sempre.</p>
                 </div>
 
                 {/* PIX Area */}
