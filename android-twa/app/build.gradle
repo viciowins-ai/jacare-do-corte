@@ -57,7 +57,7 @@ android {
         applicationId "app.vercel.jacaredocorte.twa"
         minSdkVersion 21
         targetSdkVersion 35
-        versionCode 3
+        versionCode 4
         versionName "1.0.0"
 
         // The name for the application
@@ -147,16 +147,25 @@ android {
 
         
     }
+    signingConfigs {
+        release {
+            storeFile file("upload-key.keystore")
+            storePassword "jacare123"
+            keyAlias "upload"
+            keyPassword "jacare123"
+        }
+    }
     buildTypes {
         release {
             minifyEnabled true
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    lint {
+    lintOptions {
         checkReleaseBuilds false
     }
 }
