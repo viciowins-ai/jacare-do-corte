@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-    appId: 'com.jacaredocorte.app',
+    appId: 'app.vercel.jacaredocorte.twa',
     appName: 'Jacaré do Corte',
     webDir: 'dist',
     server: {
