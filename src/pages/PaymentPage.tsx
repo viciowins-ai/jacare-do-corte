@@ -11,7 +11,7 @@ export function PaymentPage() {
     const [notified, setNotified] = useState(false);
 
     // DADOS DO PIX (Configuráveis)
-    const PIX_KEY = "viciowins@gmail.com";
+    const PIX_KEY = "humberto_485@hotmail.com";
     const APP_PRICE = "15,00";
 
     const handleCopyPix = () => {
@@ -31,7 +31,7 @@ export function PaymentPage() {
         }
 
         // Redirect to WhatsApp with pre-filled message
-        const message = `Olá! Acabei de fazer o PIX de R$ ${APP_PRICE} para liberar meu acesso no App Jacaré do Corte. Meu email é: ${user?.email}`;
+        const message = `Olá! Fiz o PIX de R$ ${APP_PRICE} para liberar meu acesso no App Jacaré do Corte (Android/iPhone). Meu email de cadastro é: ${user?.email}`;
         const whatsappLink = `https://wa.me/554199904961?text=${encodeURIComponent(message)}`;
 
         // Open WhatsApp in new tab
@@ -60,7 +60,7 @@ export function PaymentPage() {
                 <div className="bg-green-50 rounded-2xl p-6 mb-6 border border-green-100">
                     <p className="text-sm text-[#2E5C38] font-bold uppercase tracking-wider mb-1">Valor de Ativação</p>
                     <p className="text-4xl font-black text-[#2E5C38]">R$ {APP_PRICE}</p>
-                    <p className="text-xs text-green-600 mt-2 font-medium">Sem mensalidades. Ative uma vez, use para sempre.</p>
+                    <p className="text-xs text-green-600 mt-2 font-medium">Sem mensalidades. Funciona no Android e iPhone.</p>
                 </div>
 
                 {/* PIX Area */}

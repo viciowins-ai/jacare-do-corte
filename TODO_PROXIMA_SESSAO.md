@@ -1,23 +1,25 @@
 # Próximos Passos - Pós Publicação Jacaré do Corte
 
-## Status Atual: ✅ PUBLICADO!
-A atualização do app foi publicada com sucesso em 21 de janeiro, conforme confirmação no Google Play Console. Parabéns!
+## Status Atual: ✅ APP POLIDO (v2)
+- **Asset Links**: Configurado com chave de Produção (Barra de endereço deve sumir).
+- **Iconografia**: Ícone circular implementado e Splash Screen corrigida (fundo preto/circular) para evitar o quadrado preto.
+- **APK**: Versão v2 assinada entregue para teste local.
 
-## Novas Tarefas (Pós-Publicação)
+## Próximas Ações (Obrigatório para Produção)
 
-1. **Resolver Alerta de Associação de Domínio (Digital Asset Links)**:
-   - O console mostrou um alerta: "Talvez um link direto falhe porque os domínios da Web não estão associados ao app".
-   - **Objetivo**: Fazer a barra de endereço do navegador sumir no Android, tornando a experiência 100% nativa.
-   - **Ação**: Precisamos gerar o arquivo `assetlinks.json` correto (usando a nova assinatura do Google) e hospedá-lo no site em `/.well-known/assetlinks.json`.
+1.  **Conseguir 20 Testers**:
+    - O Google exige 20 testadores por 14 dias consecutivos.
+    - **Estratégia Escolhida**: (A decidir: Clientes VIP ou Contratar Serviço).
 
-2. **Verificar Instalação**:
-   - Confirmar se a atualização chegou na Play Store para os usuários finais.
+2.  **Monitorar**:
+    - Continuar de olho no Android Vitals (por enquanto sem dados, o que é bom).
 
-3. **Monitoramento**:
-   - Ficar de olho no "Android Vitals" para garantir que não há novos crashes.
+3.  **Publicar v2 na Loja**:
+    - Atualmente a loja tem a v1 (ícone quadrado).
+    - Se o teste local da v2 ficar bom, precisamos subir o novo AAB para o Google Play Console.
 
-## Histórico
+## Histórico Recente
 - [x] Resolver problema de chave de upload.
-- [x] Gerar novo AAB assinado.
-- [x] Submeter para o Google Play.
-- [x] Aprovação e Publicação.
+- [x] Configurar Asset Links (Remover barra de URL).
+- [x] Corrigir Splash Screen (Ícone Circular).
+- [x] Gerar APKs assinados para teste.
