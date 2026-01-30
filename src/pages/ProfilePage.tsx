@@ -246,16 +246,22 @@ export function ProfilePage() {
                 </div>
 
                 {/* App Settings Card */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm transition-colors">
-                    <h3 className="font-bold text-gray-900 dark:text-white text-sm mb-4">Configurações</h3>
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm transition-colors border border-gray-100 dark:border-gray-700">
+                    <h3 className="font-bold text-gray-900 dark:text-white text-base mb-4">Configurações</h3>
                     <div className="space-y-4">
                         <div
                             onClick={() => navigate('/settings')}
-                            className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
+                            className="flex items-center gap-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-3 rounded-xl transition-colors border border-gray-100 dark:border-gray-600 shadow-sm"
                         >
-                            <Settings size={20} className="text-gray-400" />
+                            <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300">
+                                <Settings size={18} />
+                            </div>
                             <div className="flex-1">
-                                <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Preferências</p>
+                                <p className="text-base font-bold text-gray-900 dark:text-white">Preferências</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Aparência, Notificações</p>
+                            </div>
+                            <div className="text-gray-400">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
                             </div>
                         </div>
 

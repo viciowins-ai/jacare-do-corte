@@ -39,13 +39,13 @@ const MOCK_AUTOMATIONS = [
 export function AdminDashboardPage() {
     const navigate = useNavigate();
     const { user } = useAuth(); // Need to access user email
-    const isMaster = user?.email === 'araucariainforma@gmail.com' || user?.email === 'viciowins@gmail.com';
+    const isMaster = user?.email === 'araucariainforma@gmail.com';
 
     const [appointments, setAppointments] = useState<AdminAppointment[]>([]);
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({ todayCount: 0, todayRevenue: 0 });
     const [automations, setAutomations] = useState(MOCK_AUTOMATIONS);
-    const [activeTab, setActiveTab] = useState<'daily' | 'automations' | 'pending_users'>('daily');
+    const [activeTab, setActiveTab] = useState<'agenda' | 'automations' | 'pending_users'>('agenda');
     const [showNotifications, setShowNotifications] = useState(false);
     const [showCustomers, setShowCustomers] = useState(false);
     const [pendingUsers, setPendingUsers] = useState<any[]>([]);
@@ -276,22 +276,26 @@ export function AdminDashboardPage() {
 
             {/* Menu Tabs */}
             <div className="px-6 mt-6 mb-4">
-                <div className="bg-white p-1 rounded-xl flex shadow-sm">
+                {/* Tab Navigation */}
+                <div className="flex gap-2 bg-gray-100 p-1 rounded-2xl mb-8 overflow-x-auto">
                     <button
-                        onClick={() => setActiveTab('daily')}
-                        className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${activeTab === 'daily' ? 'bg-[#1F2937] text-white shadow-md' : 'text-gray-500'}`}
+                        onClick={() => setActiveTab('agenda')}
+                        className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all whitespace-nowrap px-4 ${activeTab === 'agenda' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:bg-gray-200'}`}
                     >
                         Agenda
                     </button>
-                    <button
-                        onClick={() => setActiveTab('pending_users')}
-                        className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${activeTab === 'pending_users' ? 'bg-[#1F2937] text-white shadow-md' : 'text-gray-500'}`}
-                    >
-                        Pagamentos
-                    </button>
+                    {/* ONLY MASTER (Deus) SEES PAYMENTS/APPROVALS -> "Essa informação tgeria que aparecer para o modo Deus" */}
+                    {isMaster && (
+                        <button
+                            onClick={() => setActiveTab('pending_users')}
+                            className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all whitespace-nowrap px-4 ${activeTab === 'pending_users' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:bg-gray-200'}`}
+                        >
+                            Aprovações
+                        </button>
+                    )}
                     <button
                         onClick={() => setActiveTab('automations')}
-                        className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${activeTab === 'automations' ? 'bg-[#1F2937] text-white shadow-md' : 'text-gray-500'}`}
+                        className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all whitespace-nowrap px-4 ${activeTab === 'automations' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:bg-gray-200'}`}
                     >
                         Automação ⚡
                     </button>
@@ -301,7 +305,7 @@ export function AdminDashboardPage() {
             {/* Content Area */}
             <div className="flex-1 px-6 pb-24 space-y-4">
 
-                {activeTab === 'daily' && (
+                {activeTab === 'agenda' && (
                     <>
                         <div className="flex items-center justify-between">
                             <h2 className="text-lg font-bold text-gray-800">Próximos Clientes</h2>
@@ -336,11 +340,18 @@ export function AdminDashboardPage() {
 
                                     <div className="flex items-center gap-2">
                                         <a
-                                            href={`mailto:${apt.profiles?.full_name?.replace(/\s/g, '.').toLowerCase()}@email.com?subject=Lembrete de Agendamento&body=Olá ${apt.profiles?.full_name?.split(' ')[0]}, tudo confirmado para seu horário no Jacaré do Corte!`}
+                                            href={`https://wa.me/55${apt.profiles?.phone?.replace(/\D/g, '') || ''}?text=Olá ${apt.profiles?.full_name?.split(' ')[0] || 'Cliente'}, tudo confirmado para seu horário de ${format(parseISO(apt.start_time), 'HH:mm')} no Jacaré do Corte! 🐊`}
                                             target="_blank"
-                                            onClick={(e) => e.stopPropagation()}
-                                            className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition-colors"
-                                            title="Enviar E-mail"
+                                            rel="noopener noreferrer"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (!apt.profiles?.phone) {
+                                                    e.preventDefault();
+                                                    alert('Cliente sem telefone cadastrado!');
+                                                }
+                                            }}
+                                            className="w-9 h-9 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 transition-colors"
+                                            title="Enviar WhatsApp"
                                         >
                                             <MessageCircle size={18} />
                                         </a>
@@ -367,20 +378,24 @@ export function AdminDashboardPage() {
                     </>
                 )}
 
+                {/* Payment Approval Section */}
                 {activeTab === 'pending_users' && (
-                    <div className="space-y-4">
-                        <div className="bg-yellow-50 border border-yellow-100 p-4 rounded-xl flex items-start gap-3">
-                            <div className="bg-yellow-100 text-yellow-600 p-2 rounded-lg">
-                                <DollarSign size={20} />
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-gray-900 text-sm">Aprovar Pagamentos</h3>
-                                <p className="text-xs text-gray-500 leading-relaxed mt-1">
-                                    Confira se o PIX caiu na sua conta e libere o acesso dos usuários abaixo.
-                                </p>
+                    <div className="space-y-6">
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+                            <div className="flex items-start gap-4">
+                                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 shrink-0">
+                                    <span className="text-xl font-bold">$</span>
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-bold text-gray-900">Aprovar Taxa de Cadastro (R$ 15,00)</h3>
+                                    <p className="text-gray-600 mt-1">
+                                        Estes são os <strong>clientes</strong> que se cadastraram no aplicativo e realizaram o pagamento da taxa de acesso.
+                                        <br />
+                                        Confira se o PIX caiu na sua conta e clique em <strong>Aprovar</strong> para liberar o uso do app para eles.
+                                    </p>
+                                </div>
                             </div>
                         </div>
-
                         {/* List of Mock Pending Users (In real app, fetch from DB) */}
                         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
                             {pendingUsers.length === 0 ? (
@@ -457,8 +472,8 @@ export function AdminDashboardPage() {
             {/* Simple Bottom Nav for Admin */}
             <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#1F2937] text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-6 z-50 border border-white/10">
                 <button
-                    onClick={() => setActiveTab('daily')}
-                    className={`flex flex-col items-center ${activeTab === 'daily' ? 'text-[#D4AF37]' : 'text-gray-400 hover:text-white'}`}
+                    onClick={() => setActiveTab('agenda')}
+                    className={`flex flex-col items-center ${activeTab === 'agenda' ? 'text-[#D4AF37]' : 'text-gray-400 hover:text-white'}`}
                 >
                     <LayoutDashboard size={24} />
                 </button>

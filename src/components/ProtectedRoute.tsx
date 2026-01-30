@@ -18,10 +18,13 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
     // --- TRAVA DE PAGAMENTO ATIVA (VENDA DIRETA) ---
     const isAdmin = user?.email === 'admin@jacare.com' || user?.email === 'dono@jacare.com' || user?.email === 'araucariainforma@gmail.com' || user?.email === 'viciowins@gmail.com';
+    const isVisitor = user?.email === 'visitante_v5@jacare.com';
+
     const status = MockDB.getUserStatus(user!.id);
     const isPaymentPage = window.location.hash.includes('/payment');
 
-    if (!isAdmin && status !== 'approved' && !isPaymentPage) {
+    // Allow Admin OR Visitor OR Approved User
+    if (!isAdmin && !isVisitor && status !== 'approved' && !isPaymentPage) {
         return <Navigate to="/payment" replace />;
     }
 

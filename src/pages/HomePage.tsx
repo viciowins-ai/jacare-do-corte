@@ -66,20 +66,37 @@ export function HomePage() {
         setSelectedAppointment(appointment);
     };
 
-    const handleCancel = async (id: string) => {
-        if (!confirm('Deseja realmente cancelar este agendamento?')) return;
-        try {
-            const { error } = await supabase
-                .from('appointments')
-                .delete()
-                .eq('id', id);
+    const isVisitor = session?.user.email === 'visitante_v5@jacare.com';
 
-            if (error) throw error;
-            loadAppointments(); // Reload list
-        } catch (error) {
-            console.error('Error canceling appointment:', error);
-            alert('Erro ao cancelar agendamento.');
+    const handleCancel = async (id: string) => {
+        if (isVisitor) {
+            alert('Modo Visitante: Apenas visualização.\n\nPara interagir, crie sua conta!');
+            return;
         }
+        if (!confirm('Deseja realmente cancelar este agendamento?')) return;
+
+        try {
+            setLoading(true);
+
+            const { error } = await supabase.from('appointments').delete().eq('id', id);
+            if (error) console.warn('Supabase warning:', error);
+
+            MockDB.cancelAppointment(id);
+            await loadAppointments();
+            alert('Agendamento cancelado com sucesso!');
+
+        } catch (error) {
+            console.error('Error canceling:', error);
+            loadAppointments();
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleNewAppointment = () => {
+        // Allow visitor to see the layout (Teaser)
+        // Check isVisitor logic is now moved to SchedulePage on Confirm
+        navigate('/agendar');
     };
 
     return (
@@ -155,7 +172,7 @@ export function HomePage() {
                 )}
 
                 <button
-                    onClick={() => navigate('/agendar')}
+                    onClick={handleNewAppointment}
                     className="w-full bg-[#2E5C38] border-2 border-[#D4AF37] text-white font-bold h-14 rounded-full flex items-center justify-center gap-2 shadow-lg hover:bg-[#1E3F24] transition-all text-lg"
                 >
                     + Novo Agendamento

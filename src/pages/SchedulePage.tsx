@@ -87,6 +87,19 @@ export function SchedulePage() {
     }, [barbers]);
 
     async function handleBooking() {
+        const isVisitor = user?.email === 'visitante_v5@jacare.com';
+
+        if (isVisitor) {
+            if (confirm('Modo Visitante: Você está visualizando o layout.\n\nPara confirmar esse agendamento, crie sua conta agora!')) {
+                // Logout visitor and go to login
+                localStorage.removeItem('sb-access-token');
+                localStorage.removeItem('sb-refresh-token');
+                localStorage.removeItem('demo_mode');
+                window.location.href = '/';
+            }
+            return;
+        }
+
         if (!user) {
             alert('Você precisa estar logado para agendar.');
             return;
@@ -151,9 +164,6 @@ export function SchedulePage() {
                 services: selectedService,
                 barbers: selectedBarber,
             });
-
-            // alert('Modo Offline: Agendamento salvo localmente.');
-
 
             navigate('/booking-success', {
                 state: {

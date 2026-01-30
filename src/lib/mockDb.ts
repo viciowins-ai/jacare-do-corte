@@ -24,6 +24,10 @@ export const MockDB = {
         }
     },
 
+    getAllAppointments: (): Appointment[] => {
+        return MockDB.getAppointments();
+    },
+
     addAppointment: (appointment: Omit<Appointment, 'id'>) => {
         const current = MockDB.getAppointments();
         const newAppointment = {
@@ -44,6 +48,12 @@ export const MockDB = {
             return true;
         }
         return false;
+    },
+
+    cancelAppointment: (id: string) => {
+        const current = MockDB.getAppointments();
+        const updated = current.filter(a => a.id !== id);
+        localStorage.setItem(MockDB.KEY, JSON.stringify(updated));
     },
 
     // --- USER PAYMENT SIMULATION ---

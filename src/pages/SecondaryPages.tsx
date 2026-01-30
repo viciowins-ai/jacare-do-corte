@@ -682,6 +682,7 @@ export function SettingsPage() {
 
     return (
         <div className="flex flex-col min-h-screen bg-[#F5F5F7] dark:bg-gray-900 pb-40 transition-colors duration-300">
+            {/* Header */}
             <div className="bg-[#2E5C38] pt-12 pb-6 px-4 flex items-center justify-between shadow-sm">
                 <button onClick={() => navigate(-1)} className="text-white"><ArrowLeft size={24} /></button>
                 <h1 className="text-white text-lg font-bold">Configurações do App</h1>
