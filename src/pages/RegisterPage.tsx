@@ -62,6 +62,7 @@ export function RegisterPage() {
             if (msg.includes('already registered')) msg = 'Este e-mail já está cadastrado. Tente fazer login.';
             if (msg.includes('Password should be at least')) msg = 'A senha deve ter pelo menos 6 caracteres.';
             if (msg.includes('invalid claim')) msg = 'Erro no token de verificação. Tente novamente.';
+            if (msg.includes('rate limit')) msg = 'Muitas tentativas em pouco tempo. Aguarde 1 hora e tente novamente.';
             setError(msg);
         } finally {
             setLoading(false);

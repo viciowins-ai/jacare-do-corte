@@ -96,10 +96,11 @@ export function OTPVerificationPage() {
                 error = res.error;
             } else {
                 // Verify Email OTP
+                const type = location.state?.type || 'signup';
                 const res = await supabase.auth.verifyOtp({
                     email: email,
                     token: code,
-                    type: 'signup'
+                    type: type
                 });
                 error = res.error;
             }
