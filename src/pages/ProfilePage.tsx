@@ -260,7 +260,7 @@ export function ProfilePage() {
                         </div>
 
                         {/* Admin Access Button - ONLY VISIBLE TO OWNER */}
-                        {user?.email === 'viciowins@gmail.com' && (
+                        {user?.email === 'araucariainforma@gmail.com' && (
                             <div
                                 onClick={() => navigate('/admin')}
                                 className="flex items-center gap-3 pt-2 border-t border-gray-50 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5 p-2 rounded transition-colors"

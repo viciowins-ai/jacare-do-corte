@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import {
     LayoutDashboard,
     Calendar as CalendarIcon,
@@ -11,7 +12,8 @@ import {
     MoreHorizontal,
     Bell,
     Check,
-    MessageCircle
+    MessageCircle,
+    ShieldAlert
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { format, isSameDay, parseISO } from 'date-fns';
@@ -36,6 +38,9 @@ const MOCK_AUTOMATIONS = [
 
 export function AdminDashboardPage() {
     const navigate = useNavigate();
+    const { user } = useAuth(); // Need to access user email
+    const isMaster = user?.email === 'araucariainforma@gmail.com';
+
     const [appointments, setAppointments] = useState<AdminAppointment[]>([]);
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({ todayCount: 0, todayRevenue: 0 });
@@ -43,8 +48,12 @@ export function AdminDashboardPage() {
     const [activeTab, setActiveTab] = useState<'daily' | 'automations' | 'pending_users'>('daily');
     const [showNotifications, setShowNotifications] = useState(false);
     const [showCustomers, setShowCustomers] = useState(false);
+    const [pendingUsers, setPendingUsers] = useState<any[]>([]);
 
-    // Mock Data for new features
+    // Master Only State
+    const [appStatus, setAppStatus] = useState<'active' | 'blocked'>('active');
+
+    // ... (keep MOCK_DATA setup)
     const [notificationsList, setNotificationsList] = useState([
         { id: 1, text: 'Novo agendamento: João Silva - 14:00', time: '5 min', unread: true },
         { id: 2, text: 'Maria cancelou o horário de 16:30', time: '1h', unread: true },
@@ -65,6 +74,9 @@ export function AdminDashboardPage() {
 
     useEffect(() => {
         fetchAppointments();
+        // @ts-ignore
+        if (MockDB.getPendingRequests) setPendingUsers(MockDB.getPendingRequests());
+
         const savedAutos = localStorage.getItem('admin_automations_v2');
         if (savedAutos) {
             setAutomations(JSON.parse(savedAutos));
@@ -118,6 +130,13 @@ export function AdminDashboardPage() {
 
     const todayList = appointments.filter(a => isSameDay(parseISO(a.start_time), new Date()));
 
+    const handleApproveUser = (userId: string) => {
+        // @ts-ignore
+        MockDB.updateUserStatus(userId, 'approved');
+        setPendingUsers(prev => prev.filter(u => u.userId !== userId));
+        alert('Usuário aprovado! Acesso liberado.');
+    };
+
     return (
         <div className="flex flex-col min-h-screen bg-[#F3F4F6]">
             {/* Sidebar / Desktop Layout would be better, but sticking to Mobile-First responsive */}
@@ -131,6 +150,35 @@ export function AdminDashboardPage() {
                         </h1>
                         <p className="text-gray-400 text-xs mt-1">Bem-vindo, Chefe</p>
                     </div>
+
+                    {/* --- MASTER CONTROL PANEL (ONLY FOR YOU) --- */}
+                    {isMaster && (
+                        <div className="absolute top-20 left-6 z-50">
+                            <div className="bg-red-900/90 backdrop-blur-md border border-red-500 text-white p-4 rounded-xl shadow-2xl max-w-xs animate-pulse">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <ShieldAlert className="text-red-300" size={20} />
+                                    <h3 className="font-bold text-sm uppercase tracking-wider">Master Control</h3>
+                                </div>
+                                <p className="text-[10px] text-white/70 mb-3">Você está visualizando o painel como o Dono vê. (Modo Espião Ativo)</p>
+
+                                <div className="flex items-center justify-between bg-black/40 p-2 rounded-lg">
+                                    <span className="text-xs font-bold">Status do App:</span>
+                                    <button
+                                        onClick={() => {
+                                            const newStatus = appStatus === 'active' ? 'blocked' : 'active';
+                                            setAppStatus(newStatus);
+                                            // MockDB.setAppStatus(newStatus); // In real app, save to Supabase
+                                            alert(`APP ${newStatus.toUpperCase()}! (Simulação: Em produção isso travaria todos os usuários)`);
+                                        }}
+                                        className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all ${appStatus === 'active' ? 'bg-green-500 text-white' : 'bg-red-600 text-white'}`}
+                                    >
+                                        {appStatus === 'active' ? 'ATIVO' : 'BLOQUEADO'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="flex gap-3 relative">
                         <button
                             onClick={() => { setShowNotifications(!showNotifications); setShowCustomers(false); }}
@@ -335,24 +383,32 @@ export function AdminDashboardPage() {
 
                         {/* List of Mock Pending Users (In real app, fetch from DB) */}
                         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                            {/* Since we don't have a backend to list all users, we'll fake one pending user for demo purposes if none exist */}
-                            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 font-bold">
-                                        N
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-gray-900 text-sm">Novo Usuário (Demo)</p>
-                                        <p className="text-xs text-gray-400">aguardando liberação...</p>
-                                    </div>
+                            {pendingUsers.length === 0 ? (
+                                <div className="p-8 text-center text-gray-400">
+                                    <p>Nenhum pagamento pendente no momento.</p>
                                 </div>
-                                <button
-                                    onClick={() => alert('Usuário Demonstrativo Aprovado! (Em produção, isso atualizaria o banco de dados)')}
-                                    className="bg-green-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-md hover:bg-green-700 transition-colors"
-                                >
-                                    Aprovar
-                                </button>
-                            </div>
+                            ) : (
+                                pendingUsers.map((user, idx) => (
+                                    <div key={user.userId || idx} className="p-4 border-b border-gray-100 flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 font-bold text-sm">
+                                                {user.name ? user.name.charAt(0).toUpperCase() : '?'}
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-gray-900 text-sm">{user.name || 'Usuário'}</p>
+                                                <p className="text-xs text-gray-400">{user.email}</p>
+                                                <p className="text-[10px] text-gray-300">{user.phone}</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => handleApproveUser(user.userId)}
+                                            className="bg-green-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-md hover:bg-green-700 transition-colors"
+                                        >
+                                            Aprovar
+                                        </button>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
                 )}

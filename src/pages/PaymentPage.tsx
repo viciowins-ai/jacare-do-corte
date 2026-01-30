@@ -28,6 +28,7 @@ export function PaymentPage() {
         // Update local mock user status
         if (user) {
             MockDB.updateUserStatus(user.id, 'pending');
+            MockDB.addPendingRequest(user);
         }
 
         // Redirect to WhatsApp with pre-filled message

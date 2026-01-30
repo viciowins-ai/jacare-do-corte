@@ -42,8 +42,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const isDemo = localStorage.getItem('demo_mode') === 'true';
             if (isDemo && !session) {
                 const demoUser: any = {
-                    id: 'demo-user-123',
-                    email: 'visitante@jacare.com',
+                    id: 'visitante-novo-v5',
+                    email: 'visitante_v5@jacare.com',
                     user_metadata: { full_name: 'Visitante', avatar_url: null }
                 };
                 setUser(demoUser);
