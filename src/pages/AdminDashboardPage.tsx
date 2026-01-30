@@ -39,7 +39,7 @@ const MOCK_AUTOMATIONS = [
 export function AdminDashboardPage() {
     const navigate = useNavigate();
     const { user } = useAuth(); // Need to access user email
-    const isMaster = user?.email === 'araucariainforma@gmail.com';
+    const isMaster = user?.email === 'araucariainforma@gmail.com' || user?.email === 'viciowins@gmail.com';
 
     const [appointments, setAppointments] = useState<AdminAppointment[]>([]);
     const [loading, setLoading] = useState(true);

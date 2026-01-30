@@ -752,7 +752,7 @@ export function SettingsPage() {
                 </div>
 
                 {/* Admin Access - Professional Area */}
-                {user?.email === 'araucariainforma@gmail.com' && (
+                {(user?.email === 'araucariainforma@gmail.com' || user?.email === 'viciowins@gmail.com') && (
                     <div onClick={() => navigate('/admin')} className="mx-8 mb-4 bg-gradient-to-r from-[#1F2937] to-[#111827] rounded-xl p-4 flex items-center justify-between cursor-pointer shadow-lg border border-[#D4AF37]/30">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-[#D4AF37] flex items-center justify-center text-[#1F2937]">

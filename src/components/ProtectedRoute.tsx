@@ -17,7 +17,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     }
 
     // --- TRAVA DE PAGAMENTO ATIVA (VENDA DIRETA) ---
-    const isAdmin = user?.email === 'admin@jacare.com' || user?.email === 'dono@jacare.com' || user?.email === 'araucariainforma@gmail.com'; // Added owner email
+    const isAdmin = user?.email === 'admin@jacare.com' || user?.email === 'dono@jacare.com' || user?.email === 'araucariainforma@gmail.com' || user?.email === 'viciowins@gmail.com';
     const status = MockDB.getUserStatus(user!.id);
     const isPaymentPage = window.location.hash.includes('/payment');
 
