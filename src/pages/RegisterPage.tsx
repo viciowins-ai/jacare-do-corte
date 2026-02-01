@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, Phone, Lock, ArrowLeft, Loader2 } from 'lucide-react';
 import { AuthLayout } from '../layouts';
 import { supabase } from '../lib/supabase';
+import { SocialAuthButtons } from '../components/SocialAuthButtons';
 
 export function RegisterPage() {
     const [email, setEmail] = useState('');
@@ -175,6 +176,15 @@ export function RegisterPage() {
                             </button>
                         </div>
                     </form>
+
+                    <div className="my-6">
+                        <div className="relative flex justify-center text-sm items-center">
+                            <div className="absolute inset-x-0 top-1/2 h-px bg-gray-200"></div>
+                            <span className="relative z-10 bg-white px-4 text-gray-500 font-medium">ou continue com</span>
+                        </div>
+                    </div>
+
+                    <SocialAuthButtons />
 
                     <div className="mt-auto pt-6 pb-2 text-center">
                         <span className="text-gray-900 font-medium text-sm">Já tem conta? </span>

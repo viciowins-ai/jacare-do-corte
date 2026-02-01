@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Loader2 } from 'lucide-react';
 import { AuthLayout } from '../layouts';
@@ -13,9 +13,11 @@ export function LoginPage() {
     const navigate = useNavigate();
     const { session } = useAuth();
 
-    if (session) {
-        navigate('/home');
-    }
+    useEffect(() => {
+        if (session) {
+            navigate('/home');
+        }
+    }, [session, navigate]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();

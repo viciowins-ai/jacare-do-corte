@@ -109,6 +109,19 @@ export function SchedulePage() {
             return;
         }
 
+        // --- TRAVA DE PAGAMENTO (FREEMIUM) ---
+        const isAdmin = user.email === 'admin@jacare.com' || user.email === 'dono@jacare.com' || user.email === 'araucariainforma@gmail.com' || user.email === 'viciowins@gmail.com';
+        const status = MockDB.getUserStatus(user.id);
+
+        if (!isAdmin && status !== 'approved') {
+            // Opcional: Mostrar um alerta ou modal antes de redirecionar
+            if (confirm("Para realizar agendamentos exclusivos, torne-se um membro do clube!\n\nDeseja ativar sua assinatura agora?")) {
+                navigate('/payment');
+            }
+            return;
+        }
+        // -------------------------------------
+
         setLoading(true);
 
         try {
