@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react';
 import { supabase } from '../lib/supabase';
-import { Facebook, Instagram } from 'lucide-react';
+
 
 export function SocialAuthButtons({ className, ...props }: ComponentProps<'div'>) {
 
