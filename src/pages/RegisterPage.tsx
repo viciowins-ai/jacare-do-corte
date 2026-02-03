@@ -187,7 +187,6 @@ export function RegisterPage() {
                     <SocialAuthButtons />
 
                     <div className="mt-auto pt-6 pb-2 text-center">
-                        <span className="text-gray-900 font-medium text-sm">Já tem conta? </span>
                         <Link to="/login" className="text-[#D4AF37] font-bold text-sm hover:underline ml-1">Entrar</Link>
                     </div>
                 </div>

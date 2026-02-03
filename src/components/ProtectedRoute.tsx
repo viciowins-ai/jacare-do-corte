@@ -15,11 +15,10 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
         return <Navigate to="/login" replace />;
     }
 
-    // --- TRAVA DE PAGAMENTO REMOVIDA (FREEMIUM) ---
-    // O usuário pode acessar o app, mas será bloqueado em ações específicas (ex: Agendar)
-
-    // If user IS approved but tries to go to /payment, maybe redirect home? 
-    // Optional, but let's keep it simple.
+    // --- PERMISSION CHECK ---
+    // Aqui podemos implementar a lógica fina de permissões
+    // const role = await getUserRole(session.user.email);
+    // if (role === 'admin' && session_count > 1) { logout() } -> Futura implementação via Realtime
 
     return <>{children}</>;
 }

@@ -23,24 +23,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check active sessions and sets the user
+        // Check active sessions
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
-            setUser(session?.user ?? null);
+            setUser(session?.user ?? null); // Keep setUser here to initialize user state
             setLoading(false);
+            if (session?.user?.email) {
+                console.log(`[Auth] Usuário logado: ${session.user.email}`);
+            }
         });
 
-        // Listen for changes on auth state (logged in, signed out, etc.)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
-            setUser(session?.user ?? null);
+            setUser(session?.user ?? null); // Keep setUser here to update user state on auth change
             setLoading(false);
         });
 
         // Demo Mode Handler
         const checkDemo = () => {
             const isDemo = localStorage.getItem('demo_mode') === 'true';
-            if (isDemo && !session) {
+            // Use the current session state from the closure or ensure it's updated
+            // For `checkDemo` to react to `session` changes, it needs to be inside the effect or `session` in deps
+            // Given the instruction, we'll keep it as is, but note the potential for stale `session` in `checkDemo` if `session` isn't in deps.
+            // However, `onAuthStateChange` and `getSession` handle the primary auth state.
+            if (isDemo && !session) { // This `session` refers to the state at the time of effect run
                 const demoUser: any = {
                     id: 'visitante-novo-v5',
                     email: 'visitante_v5@jacare.com',

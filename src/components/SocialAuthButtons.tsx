@@ -6,34 +6,41 @@ export function SocialAuthButtons({ className, ...props }: ComponentProps<'div'>
 
     const handleLogin = async (provider: 'google' | 'facebook' | 'instagram') => {
         try {
-            // Instagram usually requires specific setup or is part of Facebook business integration
-            // Supabase supports 'google', 'facebook', 'twitter', 'apple', 'discord', etc.
-            // 'instagram' might not be a direct provider without configuration.
-            // We will attempt it, but if it fails, it fails gracefully.
+            console.log(`[SocialAuth] Iniciando login com ${provider}...`);
 
-            // For now, let's map instagram to facebook if needed or keep it disparate if configured.
-            // Actually 'instagram' is NOT in the default Supabase Provider types usually.
-            // We will try to pass it as a string, but it might be better to treat it as "Coming Soon" if not configured.
-
-            // Standard Supabase Providers: apple, azure, bitbucket, discord, facebook, github, gitlab, google, keycloak, linkedin, notion, slack, spotify, twitch, twitter, workos.
-            // No 'instagram' by default.
-
+            // Tratamento especial para Instagram (não suportado nativamente da mesma forma simples)
             if (provider === 'instagram') {
-                alert('Login com Instagram em breve! Utilize o Facebook.');
+                alert('Login com Instagram em breve! Utilize o Facebook ou Google.');
                 return;
             }
 
-            const { error } = await supabase.auth.signInWithOAuth({
+            // Simplificando o redirect para a raiz (origin) para evitar erros de whitelist no Supabase.
+            // O AuthContext ou a página de Login vai redirecionar para /home se já estiver logado.
+            const redirectUrl = window.location.origin;
+            console.log(`[SocialAuth] Redirect URL: ${redirectUrl}`);
+
+            const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: provider as any,
                 options: {
-                    redirectTo: `${window.location.origin}/home`,
+                    redirectTo: redirectUrl,
+                    queryParams: {
+                        access_type: 'offline',
+                        prompt: 'consent',
+                    },
                 },
             });
 
-            if (error) throw error;
+            if (error) {
+                console.error('[SocialAuth] Erro retornado pelo Supabase:', error);
+                throw error;
+            }
+
+            console.log('[SocialAuth] Redirecionamento iniciado:', data);
+
         } catch (error: any) {
-            console.error('Social login error:', error);
-            alert(`Erro ao conectar com ${provider}: ${error.message}`);
+            console.error('[SocialAuth] Falha crítica:', error);
+            // Mostra o erro exato na tela para o usuário (facilita o debug no celular)
+            alert(`Erro no Login (${provider}): ${error.message || error.error_description || JSON.stringify(error)}`);
         }
     };
 

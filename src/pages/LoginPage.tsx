@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Loader2 } from 'lucide-react';
 import { AuthLayout } from '../layouts';
 import { supabase } from '../lib/supabase';
+import { SocialAuthButtons } from '../components/SocialAuthButtons';
 import { useAuth } from '../contexts/AuthContext';
 
 export function LoginPage() {
@@ -123,7 +124,15 @@ export function LoginPage() {
                     </button>
                 </form>
 
-                <div className="w-full mt-4">
+                <div className="my-6 w-full">
+                    <div className="relative flex justify-center text-sm items-center mb-4">
+                        <div className="absolute inset-x-0 top-1/2 h-px bg-gray-200"></div>
+                        <span className="relative z-10 bg-[#F5F5F7] px-4 text-gray-500 font-medium">ou</span>
+                    </div>
+                    <SocialAuthButtons />
+                </div>
+
+                <div className="w-full mt-0">
                     <button
                         onClick={() => {
                             localStorage.setItem('demo_mode', 'true');
