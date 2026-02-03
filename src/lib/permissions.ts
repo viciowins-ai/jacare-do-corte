@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+// import { supabase } from '../lib/supabase';
 
 export type UserRole = 'master' | 'admin' | 'barber' | 'client';
 
