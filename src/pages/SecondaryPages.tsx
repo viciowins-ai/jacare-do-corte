@@ -82,6 +82,7 @@ export function OTPVerificationPage() {
 
         setLoading(true);
         setError(null);
+        console.log('Verificando código:', code, 'Para:', email || phone);
 
         try {
             let error;
@@ -97,6 +98,7 @@ export function OTPVerificationPage() {
             } else {
                 // Verify Email OTP
                 const type = location.state?.type || 'signup';
+                console.log('Tipo de verificação:', type);
                 const res = await supabase.auth.verifyOtp({
                     email: email,
                     token: code,
@@ -105,10 +107,15 @@ export function OTPVerificationPage() {
                 error = res.error;
             }
 
-            if (error) throw error;
+            if (error) {
+                console.error('Erro na verificação:', error);
+                throw error;
+            }
 
+            console.log('Verificação Sucesso!');
             navigate('/home');
         } catch (err: any) {
+            console.error('Catch Error Verify:', err);
             setError(err.message || 'Código inválido ou expirado.');
         } finally {
             setLoading(false);
@@ -116,6 +123,7 @@ export function OTPVerificationPage() {
     };
 
     const handleResend = async () => {
+        console.log('Tentando reenviar código para:', email || phone);
         try {
             let error;
             if (phone) {
@@ -132,9 +140,14 @@ export function OTPVerificationPage() {
                 error = res.error;
             }
 
-            if (error) throw error;
-            alert(`Código reenviado para ${phone ? 'seu e-mail' : 'seu e-mail'}!`);
+            if (error) {
+                console.error('Erro ao reenviar:', error);
+                throw error;
+            }
+            console.log('Reenvio com sucesso!');
+            alert(`Código reenviado para ${phone ? 'seu celular' : 'seu e-mail'}! Verifique o SPAM.`);
         } catch (err: any) {
+            console.error('Catch Error Resend:', err);
             alert('Erro ao reenviar código: ' + err.message);
         }
     };

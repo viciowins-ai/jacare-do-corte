@@ -1,14 +1,31 @@
 # Próximos Passos - Jacaré do Corte
 
-## Estado Atual
-- **Preço Configurado:** R$ 15,00 (Pagamento Único).
-- **PIX:** humberto_485@hotmail.com.
-- **Site/App:** Publicado em `https://jacare-do-corte-app.vercel.app`.
-- **Android:** APK v1.3 gerado (`jacare-do-corte-final.apk`) com alterações novas.
-- **Manual:** Criado `GUIA_COMERCIAL_E_INSTALACAO.md` para ajudar na venda.
+## Estado Atual (03/02/2026 - Noite)
+- **App:** Funcional e rodando localmente.
+- **Servidor:** Parado (deve iniciar com `npm run dev`).
+- **Tarefa em Andamento:** Configuração do SMTP no Supabase.
 
-## Para Fazer Amanhã
-1. **Testar Links:** Confirmar se o novo link `https://jacare-do-corte-app.vercel.app` está abrindo corretamente no celular.
-2. **Testar Android:** Instalar o APK `jacare-do-corte-final.apk` no celular para ver se o fluxo de pagamento está certinho.
-3. **Google Play:** Se o teste for aprovado, podemos subir essa versão para a Google Play Console (se desejar).
-4. **Painel Admin:** (Opcional) Verificar como o dono vai gerenciar os usuários além do WhatsApp.
+## 🛑 Onde Paramos (Ponto de Retorno)
+Você já gerou a **Senha de App do Google** (16 letras), mas falta **salvar no Supabase**.
+
+### 1. Ao abrir o computador:
+1.  Acesse: [supabase.com/dashboard](https://supabase.com/dashboard) > Projeto "Jacaré do Corte".
+2.  No menu lateral esquerdo (barra preta fina), clique em **Authentication** (ícone de bonequinhos).
+3.  Na lista ao lado da barra preta, clique em **Email** (abaixo de "NOTIFICATIONS").
+4.  Ative **Enable Custom SMTP**.
+
+### 2. Preencha os dados:
+*   **Sender Email:** Seu e-mail do Gmail.
+*   **Sender Name:** `Jacaré do Corte`
+*   **Host:** `smtp.gmail.com`
+*   **Port:** `465`
+*   **User:** Seu e-mail do Gmail.
+*   **Password:** A senha de 16 letras gerada no Google (se perdeu, gere outra em `myaccount.google.com/apppasswords`).
+
+---
+
+## Próximos Passos (Pós-Configuração)
+1.  **Salvar** as configurações no Supabase.
+2.  **Testar Cadastro:** Criar um usuário novo no app para ver se o e-mail chega.
+3.  **Testar Android:** Se tudo funcionar, o app mobile também funcionará.
+

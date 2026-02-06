@@ -36,6 +36,8 @@ export function RegisterPage() {
                 formattedPhone = '+' + formattedPhone;
             }
 
+            console.log('Iniciando cadastro para:', email);
+
             // Register using EMAIL as primary auth
             const { data, error } = await supabase.auth.signUp({
                 email,
@@ -48,22 +50,36 @@ export function RegisterPage() {
                 },
             });
 
-            if (error) throw error;
+            if (error) {
+                console.error('Erro Supabase SignUp:', error);
+                throw error;
+            }
+
+            console.log('Cadastro Sucesso:', data);
 
             if (data.session) {
+                console.log('Sessão criada automaticamente (Auto Confirm ON?)');
                 navigate('/home');
             } else {
+                console.log('Sessão não criada. Redirecionando para OTP. (Email Confirm ON)');
                 // Navigate to OTP page passing email for verification context
                 navigate('/verify-otp', { state: { email } });
             }
 
         } catch (err: any) {
-            console.error(err);
+            console.error('Catch Error Register:', err);
             let msg = err.message || 'Erro ao criar conta.';
             if (msg.includes('already registered')) msg = 'Este e-mail já está cadastrado. Tente fazer login.';
             if (msg.includes('Password should be at least')) msg = 'A senha deve ter pelo menos 6 caracteres.';
             if (msg.includes('invalid claim')) msg = 'Erro no token de verificação. Tente novamente.';
-            if (msg.includes('rate limit')) msg = 'Muitas tentativas em pouco tempo. Aguarde 1 hora e tente novamente.';
+            if (msg.includes('rate limit')) {
+                msg = 'Muitas tentativas recentemente. (Rate Limit do Supabase).\n\nDICA DE DEV: Vá no Supabase > Auth > Users e confirme manualmente o usuário, ou aguarde 1 hora.';
+                console.warn('⚠️ RATE LIMIT ATINGIDO! Como você é o desenvolvedor:');
+                console.warn('1. Vá em Authentication > Users no painel do Supabase.');
+                console.warn('2. Encontre este email (' + email + ').');
+                console.warn('3. Clique nos três pontinhos (...) e selecione "Confirm User".');
+                console.warn('4. Depois, pode fazer LOGIN direto com a senha criada.');
+            }
             setError(msg);
         } finally {
             setLoading(false);

@@ -134,7 +134,16 @@ export function ProfilePage() {
                     />
                     <div className="flex flex-col text-white">
                         <h2 className="text-xl font-bold mb-1">{user?.user_metadata?.full_name || 'Visitante'}</h2>
-                        <p className="text-white/80 text-sm">{user?.user_metadata?.phone || 'Sem telefone'}</p>
+                        <div className="flex items-center gap-2">
+                            <p className="text-white/80 text-sm">{user?.user_metadata?.phone || 'Sem telefone'}</p>
+                            <button
+                                onClick={() => navigate('/complete-register', { state: { editing: true } })}
+                                className="bg-white/20 p-1.5 rounded-full hover:bg-white/30 transition-colors"
+                                title="Editar Telefone"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                            </button>
+                        </div>
                         <p className="text-white/60 text-xs mt-1">{user?.email}</p>
                     </div>
                 </div>

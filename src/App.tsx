@@ -1,11 +1,13 @@
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { RequireProfileCompletion } from './components/RequireProfileCompletion';
 import { AppLayout } from './layouts';
 
 // Pages
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { CompleteRegisterPage } from './pages/CompleteRegisterPage';
 import { HomePage } from './pages/HomePage';
 import { SchedulePage } from './pages/SchedulePage';
 import { ProfilePage } from './pages/ProfilePage';
@@ -13,10 +15,7 @@ import { SuccessBookingPage } from './pages/SuccessBookingPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { PaymentPage } from './pages/PaymentPage';
 
-// Secondary Pages (Placeholder for now, mapped to Support/About/Settings if they exist or fallback)
-// Assuming SecondaryPages.tsx exists or we might need to create placeholders if they break build.
-// For now, I will comment them out if I'm not sure they exist, OR verify existence.
-// Previous read of App.tsx showed them imported. I'll keep them but might need to ensure they exist.
+// Secondary Pages
 import {
   OTPVerificationPage,
   PasswordResetSuccessPage,
@@ -48,15 +47,30 @@ export default function App() {
             <Route path="/verify-otp" element={<OTPVerificationPage />} />
             <Route path="/reset-success" element={<PasswordResetSuccessPage />} />
 
-            {/* Payment Route - Protected, Full Screen (No Nav) */}
-            <Route path="/payment" element={
+            {/* Complete Profile Route - Protected but NOT checked for completion (to avoid loops) */}
+            <Route path="/complete-register" element={
               <ProtectedRoute>
-                <PaymentPage />
+                <CompleteRegisterPage />
               </ProtectedRoute>
             } />
 
-            {/* App Routes - Protected (With Bottom Nav) */}
-            <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+            {/* Payment Route - Protected, Full Screen (No Nav) */}
+            <Route path="/payment" element={
+              <ProtectedRoute>
+                <RequireProfileCompletion>
+                  <PaymentPage />
+                </RequireProfileCompletion>
+              </ProtectedRoute>
+            } />
+
+            {/* App Routes - Protected & Require Profile Completion (With Bottom Nav) */}
+            <Route element={
+              <ProtectedRoute>
+                <RequireProfileCompletion>
+                  <AppLayout />
+                </RequireProfileCompletion>
+              </ProtectedRoute>
+            }>
               <Route path="/home" element={<HomePage />} />
               <Route path="/agendar" element={<SchedulePage />} />
               <Route path="/perfil" element={<ProfilePage />} />
@@ -70,9 +84,6 @@ export default function App() {
               <Route path="/report" element={<ReportProblemPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />
-              {/* Success Booking might technically be full screen, but usually fits in app flow. 
-                Screenshot showed no nav? Actually Step 200 Image 2 shows Bottom Nav!
-                So it stays here. */}
               <Route path="/booking-success" element={<SuccessBookingPage />} />
             </Route>
 
