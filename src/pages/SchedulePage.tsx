@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MockDB } from '../lib/mockDb';
-import { ArrowLeft, Scissors, User, Monitor, PlayCircle, Settings } from 'lucide-react';
+import { ArrowLeft, Scissors, User, Monitor, PlayCircle, Settings, Lock } from 'lucide-react';
 import { ImageWithFallback } from '../components/ImageWithFallback';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -31,6 +31,20 @@ export function SchedulePage() {
     const [selectedBarberId, setSelectedBarberId] = useState<string | number | null>(null);
     const [selectedDate, setSelectedDate] = useState<number>(new Date().getDate()); // Day of month
     const [selectedTime, setSelectedTime] = useState<string | null>('09:00');
+
+    // User Status for Lock
+    const [userStatus, setUserStatus] = useState<'pending' | 'approved' | 'blocked'>('pending');
+
+    // Admin Check helper
+    const isAdmin = user?.email === 'admin@jacare.com' || user?.email === 'dono@jacare.com' || user?.email === 'araucariainforma@gmail.com' || user?.email === 'viciowins@gmail.com';
+    const isVisitor = user?.email === 'visitante_v5@jacare.com';
+    const isLocked = !isVisitor && !isAdmin && userStatus !== 'approved' && userStatus !== 'blocked'; // Blocked users handled differently usually, but pending needs lock
+
+    useEffect(() => {
+        if (user) {
+            setUserStatus(MockDB.getUserStatus(user.id));
+        }
+    }, [user]);
 
     // Calendar Data
     const today = new Date();
@@ -405,13 +419,19 @@ export function SchedulePage() {
                 </button>
 
                 <button
-                    onClick={handleBooking}
+                    onClick={isLocked ? () => navigate('/payment') : handleBooking}
                     disabled={loading}
-                    className="flex flex-col items-center justify-center gap-1 text-[#D4AF37] -mt-1 disabled:opacity-50"
+                    className={`flex flex-col items-center justify-center gap-1 ${isLocked ? 'text-gray-400' : 'text-[#D4AF37]'} -mt-1 disabled:opacity-50`}
                 >
                     <div className="flex items-center gap-1.5">
-                        <PlayCircle size={18} fill="#D4AF37" className="text-[#2E5C38]" />
-                        <span className="text-[11px] font-bold tracking-wide uppercase">Confirmar Agendamento</span>
+                        {isLocked ? (
+                            <Lock size={18} className="text-gray-500" />
+                        ) : (
+                            <PlayCircle size={18} fill="#D4AF37" className="text-[#2E5C38]" />
+                        )}
+                        <span className="text-[11px] font-bold tracking-wide uppercase">
+                            {isLocked ? 'Assinar Clube' : 'Confirmar Agendamento'}
+                        </span>
                     </div>
                 </button>
 
