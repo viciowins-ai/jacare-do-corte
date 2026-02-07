@@ -1,6 +1,33 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Home, CalendarPlus, User } from 'lucide-react';
+import { Home, CalendarPlus, User, WifiOff } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import clsx from 'clsx';
+
+function OfflineBanner() {
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+    useEffect(() => {
+        const handleOnline = () => setIsOnline(true);
+        const handleOffline = () => setIsOnline(false);
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        };
+    }, []);
+
+    if (isOnline) return null;
+
+    return (
+        <div className="bg-orange-500 text-white text-xs font-bold text-center py-1 absolute top-0 w-full z-[100] flex items-center justify-center gap-1 shadow-md animate-in slide-in-from-top-2">
+            <WifiOff size={14} />
+            <span>Sem internet - Usando dados locais</span>
+        </div>
+    );
+}
 
 export function AppLayout() {
     const location = useLocation();
@@ -11,6 +38,7 @@ export function AppLayout() {
 
     return (
         <div className="flex flex-col h-screen bg-[#F5F5F7] dark:bg-gray-900 max-w-md mx-auto shadow-2xl overflow-hidden relative transition-colors duration-300">
+            <OfflineBanner />
             {/* Content Area - Increased padding to avoid nav overlap */}
             <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide pb-32">
                 <Outlet />

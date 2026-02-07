@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Settings } from 'lucide-react';
+import { ImageWithFallback } from '../components/ImageWithFallback';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -226,7 +227,12 @@ export function HomePage() {
 
                             <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-xl">
                                 <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 border-2 border-white shadow-sm">
-                                    <img src={selectedAppointment.barbers.avatar_url} alt={selectedAppointment.barbers.name} className="w-full h-full object-cover" />
+                                    <ImageWithFallback
+                                        src={selectedAppointment.barbers.avatar_url}
+                                        type="barber"
+                                        className="w-full h-full object-cover"
+                                        alt={selectedAppointment.barbers.name}
+                                    />
                                 </div>
                                 <div>
                                     <p className="text-xs text-gray-500 uppercase font-bold">Profissional</p>

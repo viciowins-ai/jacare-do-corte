@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, CreditCard, Settings, QrCode } from 'lucide-react';
+import { ImageWithFallback } from '../components/ImageWithFallback';
 import { useAuth } from '../contexts/AuthContext';
 import { useEffect, useState } from 'react';
 import { MockDB } from '../lib/mockDb';
@@ -81,10 +82,12 @@ export function ProfilePage() {
                     <div className="relative group cursor-pointer" onClick={() => document.getElementById('avatar-upload')?.click()}>
                         <div className="w-24 h-24 rounded-full border-[3px] border-[#D4AF37] p-1 shrink-0 relative overflow-hidden">
                             <div className="w-full h-full rounded-full bg-white overflow-hidden relative">
-                                <img
-                                    src={user?.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.user_metadata?.full_name || 'User'}`}
-                                    alt="User"
+                                <ImageWithFallback
+                                    src={user?.user_metadata?.avatar_url}
+                                    fallbackSrc={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.user_metadata?.full_name || 'User'}`}
+                                    type="user"
                                     className="w-full h-full object-cover object-center"
+                                    alt="User"
                                 />
                                 { /* Upload Overlay */}
                                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -136,11 +139,7 @@ export function ProfilePage() {
                         <h2 className="text-xl font-bold mb-1">{user?.user_metadata?.full_name || 'Visitante'}</h2>
                         <div className="flex items-center gap-2">
                             <p className="text-white/80 text-sm">{user?.user_metadata?.phone || 'Sem telefone'}</p>
-<<<<<<< HEAD
                             <button
-=======
-                            <button 
->>>>>>> b7dbf5d15f07ccdcc54e4a402d37f315bf2b27ac
                                 onClick={() => navigate('/complete-register', { state: { editing: true } })}
                                 className="bg-white/20 p-1.5 rounded-full hover:bg-white/30 transition-colors"
                                 title="Editar Telefone"
