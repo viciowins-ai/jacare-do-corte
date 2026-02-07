@@ -67,9 +67,13 @@ export function SchedulePage() {
             console.error('Erro ao buscar dados:', error);
             // Fallback mock data if DB is empty or fails
             setServices([
-                { id: 1, name: 'Corte de Cabelo', price: 40 },
-                { id: 2, name: 'Barba', price: 30 },
-                { id: 3, name: 'Corte + Barba', price: 65 }
+                { id: 1, name: 'Cabelo', price: 30 },
+                { id: 2, name: 'Barba', price: 20 },
+                { id: 3, name: 'Barba + Cabelo + Sobrancelha', price: 50 },
+                { id: 4, name: 'Sobrancelha', price: 10 },
+                { id: 5, name: 'Luzes', price: 130 },
+                { id: 6, name: 'Platinado', price: 130 },
+                { id: 7, name: 'Reflexo Alinhado', price: 130 }
             ]);
             setBarbers([
                 { id: 1, name: 'Jacaré', avatar_url: '/logo_jacare.jpg' }
@@ -228,7 +232,7 @@ export function SchedulePage() {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            {services.filter(s => s.name.toLowerCase().includes('corte de cabelo') || s.name === 'Barba').map((service) => (
+                            {services.filter(s => s.name.toLowerCase().includes('cabelo') || s.name.toLowerCase().includes('barba')).map((service) => (
                                 <div
                                     key={service.id}
                                     onClick={() => setSelectedServiceId(service.id)}
@@ -258,7 +262,7 @@ export function SchedulePage() {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            {services.filter(s => !s.name.toLowerCase().includes('corte de cabelo') && s.name !== 'Barba').map((service) => (
+                            {services.filter(s => !s.name.toLowerCase().includes('cabelo') && !s.name.toLowerCase().includes('barba')).map((service) => (
                                 <div
                                     key={service.id}
                                     onClick={() => setSelectedServiceId(service.id)}
