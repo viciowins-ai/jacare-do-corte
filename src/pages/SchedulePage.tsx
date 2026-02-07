@@ -26,7 +26,7 @@ export function SchedulePage() {
     const [services, setServices] = useState<Service[]>([]);
     const [barbers, setBarbers] = useState<Barber[]>([]);
 
-    const [selectedServiceId, setSelectedServiceId] = useState<string | number | null>(null);
+    const [selectedServiceIds, setSelectedServiceIds] = useState<number[]>([]);
     const [selectedBarberId, setSelectedBarberId] = useState<string | number | null>(null);
     const [selectedDate, setSelectedDate] = useState<number>(new Date().getDate()); // Day of month
     const [selectedTime, setSelectedTime] = useState<string | null>('09:00');
@@ -90,6 +90,14 @@ export function SchedulePage() {
         }
     }, [barbers]);
 
+    const toggleService = (id: number) => {
+        if (selectedServiceIds.includes(id)) {
+            setSelectedServiceIds(prev => prev.filter(sId => sId !== id));
+        } else {
+            setSelectedServiceIds(prev => [...prev, id]);
+        }
+    };
+
     async function handleBooking() {
         const isVisitor = user?.email === 'visitante_v5@jacare.com';
 
@@ -108,8 +116,8 @@ export function SchedulePage() {
             alert('Você precisa estar logado para agendar.');
             return;
         }
-        if (!selectedServiceId || !selectedBarberId || !selectedDate || !selectedTime) {
-            alert('Por favor, preencha todos os campos do agendamento.');
+        if (selectedServiceIds.length === 0 || !selectedBarberId || !selectedDate || !selectedTime) {
+            alert('Por favor, selecione pelo menos um serviço, barbeiro, data e hora.');
             return;
         }
 
@@ -136,26 +144,35 @@ export function SchedulePage() {
             const dateStr = `${year}-${month}-${selectedDate.toString().padStart(2, '0')}`;
             const startTime = `${dateStr}T${selectedTime}:00`;
 
-            const { error } = await supabase
-                .from('appointments')
-                .insert([
-                    {
-                        user_id: user.id,
-                        service_id: selectedServiceId,
-                        barber_id: selectedBarberId,
-                        start_time: startTime,
-                        status: 'scheduled'
-                    }
-                ]);
-
-            if (error) throw error;
-
-            const selectedService = services.find(s => s.id === selectedServiceId);
             const selectedBarber = barbers.find(b => b.id === selectedBarberId);
+            const selectedServicesList = services.filter(s => selectedServiceIds.includes(s.id as number));
+
+            // Create an array of promises to insert multiple appointments
+            const appointmentPromises = selectedServiceIds.map(serviceId =>
+                supabase
+                    .from('appointments')
+                    .insert([
+                        {
+                            user_id: user.id,
+                            service_id: serviceId,
+                            barber_id: selectedBarberId,
+                            start_time: startTime,
+                            status: 'scheduled'
+                        }
+                    ])
+            );
+
+            const results = await Promise.all(appointmentPromises);
+
+            // Check for errors in any of the requests
+            const errors = results.filter(r => r.error);
+            if (errors.length > 0) throw errors[0].error;
+
+            const serviceNames = selectedServicesList.map(s => s.name).join(' + ');
 
             navigate('/booking-success', {
                 state: {
-                    serviceName: selectedService?.name,
+                    serviceName: serviceNames,
                     barberName: selectedBarber?.name,
                     date: startTime
                 }
@@ -164,8 +181,8 @@ export function SchedulePage() {
             console.error('Erro ao agendar:', error);
 
             // Fallback: Save to Local Mock DB (Offline Mode)
-            const selectedService = services.find(s => s.id === selectedServiceId);
             const selectedBarber = barbers.find(b => b.id === selectedBarberId);
+            const selectedServicesList = services.filter(s => selectedServiceIds.includes(s.id as number));
 
             // Reconstruct time
             const today = new Date();
@@ -174,17 +191,22 @@ export function SchedulePage() {
             const dateStr = `${year}-${month}-${selectedDate.toString().padStart(2, '0')}`;
             const startTime = `${dateStr}T${selectedTime}:00`;
 
-            MockDB.addAppointment({
-                user_id: user?.id || 'offline-user',
-                start_time: startTime,
-                status: 'scheduled',
-                services: selectedService,
-                barbers: selectedBarber,
+            // For MockDB, we'll iterate too
+            selectedServicesList.forEach(service => {
+                MockDB.addAppointment({
+                    user_id: user?.id || 'offline-user',
+                    start_time: startTime,
+                    status: 'scheduled',
+                    services: service,
+                    barbers: selectedBarber,
+                });
             });
+
+            const serviceNames = selectedServicesList.map(s => s.name).join(' + ');
 
             navigate('/booking-success', {
                 state: {
-                    serviceName: selectedService?.name,
+                    serviceName: serviceNames,
                     barberName: selectedBarber?.name,
                     date: startTime
                 }
@@ -220,33 +242,36 @@ export function SchedulePage() {
 
                 {/* Services Section */}
                 <div className="bg-white dark:bg-gray-800 rounded-[20px] p-5 shadow-sm transition-colors">
-                    <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Escolha o Serviço</h2>
+                    <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Escolha os Serviços (Selecione um ou mais)</h2>
 
                     {/* Group 1: Cabelo/Barba */}
                     <div className="relative mb-4">
                         <div className="flex justify-between items-start mb-2">
-                            <span className="font-bold text-[#2E5C38] text-sm">Barba</span>
+                            <span className="font-bold text-[#2E5C38] text-sm">Barba & Cabelo</span>
                             <div className="w-8 h-8 rounded-full bg-[#2E5C38] flex items-center justify-center text-white shadow-sm">
                                 <Scissors size={16} />
                             </div>
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            {services.filter(s => s.name.toLowerCase().includes('cabelo') || s.name.toLowerCase().includes('barba')).map((service) => (
-                                <div
-                                    key={service.id}
-                                    onClick={() => setSelectedServiceId(service.id)}
-                                    className="flex items-center justify-between cursor-pointer hover:bg-gray-50 rounded-lg py-1 transition-colors"
-                                >
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{service.name}</span>
-                                        <span className="text-xs text-gray-500 dark:text-gray-400">{formatPrice(service.price)}</span>
+                            {services.filter(s => s.name.toLowerCase().includes('cabelo') || s.name.toLowerCase().includes('barba')).map((service) => {
+                                const isSelected = selectedServiceIds.includes(service.id as number);
+                                return (
+                                    <div
+                                        key={service.id}
+                                        onClick={() => toggleService(service.id as number)}
+                                        className={`flex items-center justify-between cursor-pointer rounded-lg py-2 px-2 transition-all border ${isSelected ? 'bg-green-50 border-[#2E5C38]' : 'hover:bg-gray-50 border-transparent'}`}
+                                    >
+                                        <div className="flex flex-col">
+                                            <span className={`text-sm font-bold ${isSelected ? 'text-[#2E5C38]' : 'text-gray-900 dark:text-gray-100'}`}>{service.name}</span>
+                                            <span className="text-xs text-gray-500 dark:text-gray-400">{formatPrice(service.price)}</span>
+                                        </div>
+                                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${isSelected ? 'bg-[#2E5C38] border-[#2E5C38]' : 'border-gray-300 dark:border-gray-600'}`}>
+                                            {isSelected && <div className="w-2.5 h-1.5 border-l-2 border-b-2 border-white rotate-[-45deg] mb-0.5" />}
+                                        </div>
                                     </div>
-                                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedServiceId === service.id ? 'border-[#2E5C38]' : 'border-gray-300 dark:border-gray-600'}`}>
-                                        {selectedServiceId === service.id && <div className="w-2 h-2 rounded-full bg-[#2E5C38]" />}
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -262,25 +287,38 @@ export function SchedulePage() {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            {services.filter(s => !s.name.toLowerCase().includes('cabelo') && !s.name.toLowerCase().includes('barba')).map((service) => (
-                                <div
-                                    key={service.id}
-                                    onClick={() => setSelectedServiceId(service.id)}
-                                    className="flex items-center justify-between cursor-pointer hover:bg-gray-50 rounded-lg py-1 transition-colors"
-                                >
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{service.name}</span>
-                                        <span className="text-xs text-gray-500 dark:text-gray-400">{formatPrice(service.price)}</span>
+                            {services.filter(s => !s.name.toLowerCase().includes('cabelo') && !s.name.toLowerCase().includes('barba')).map((service) => {
+                                const isSelected = selectedServiceIds.includes(service.id as number);
+                                return (
+                                    <div
+                                        key={service.id}
+                                        onClick={() => toggleService(service.id as number)}
+                                        className={`flex items-center justify-between cursor-pointer rounded-lg py-2 px-2 transition-all border ${isSelected ? 'bg-green-50 border-[#2E5C38]' : 'hover:bg-gray-50 border-transparent'}`}
+                                    >
+                                        <div className="flex flex-col">
+                                            <span className={`text-sm font-bold ${isSelected ? 'text-[#2E5C38]' : 'text-gray-900 dark:text-gray-100'}`}>{service.name}</span>
+                                            <span className="text-xs text-gray-500 dark:text-gray-400">{formatPrice(service.price)}</span>
+                                        </div>
+                                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${isSelected ? 'bg-[#2E5C38] border-[#2E5C38]' : 'border-gray-300 dark:border-gray-600'}`}>
+                                            {isSelected && <div className="w-2.5 h-1.5 border-l-2 border-b-2 border-white rotate-[-45deg] mb-0.5" />}
+                                        </div>
                                     </div>
-                                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedServiceId === service.id ? 'border-[#2E5C38]' : 'border-gray-300 dark:border-gray-600'}`}>
-                                        {selectedServiceId === service.id && <div className="w-2 h-2 rounded-full bg-[#2E5C38]" />}
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
 
                     {services.length === 0 && !loading && <span className="text-gray-500 text-sm">Nenhum serviço disponível.</span>}
+
+                    {/* Total Summary */}
+                    {selectedServiceIds.length > 0 && (
+                        <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center animate-in fade-in slide-in-from-bottom-2">
+                            <span className="text-sm text-gray-500">Total estimado:</span>
+                            <span className="text-lg font-bold text-[#2E5C38]">
+                                {formatPrice(services.filter(s => selectedServiceIds.includes(s.id as number)).reduce((sum, s) => sum + s.price, 0))}
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 {/* Professionals Section */}

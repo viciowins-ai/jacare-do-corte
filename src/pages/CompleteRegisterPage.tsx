@@ -35,7 +35,11 @@ export function CompleteRegisterPage() {
             if (formattedPhone.length < 10) {
                 throw new Error('Número de telefone inválido.');
             }
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> b7dbf5d15f07ccdcc54e4a402d37f315bf2b27ac
             // Add +55 if missing (assuming BR for now as per previous logic)
             if (formattedPhone.length === 10 || formattedPhone.length === 11) {
                 formattedPhone = '55' + formattedPhone;
@@ -68,7 +72,11 @@ export function CompleteRegisterPage() {
     return (
         <div className="flex flex-col h-screen bg-[#F5F5F7] items-center justify-center px-6">
             <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 text-center">
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> b7dbf5d15f07ccdcc54e4a402d37f315bf2b27ac
                 <div className="w-20 h-20 bg-[#2E5C38] rounded-full mx-auto flex items-center justify-center mb-6 shadow-lg text-white">
                     <Phone size={32} />
                 </div>
@@ -88,7 +96,11 @@ export function CompleteRegisterPage() {
                     <div className="relative group text-left">
                         <label className="text-xs font-bold text-gray-500 ml-1 uppercase mb-1 block">Celular / WhatsApp</label>
                         <div className="relative">
+<<<<<<< HEAD
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+=======
+                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+>>>>>>> b7dbf5d15f07ccdcc54e4a402d37f315bf2b27ac
                                 <Phone size={20} />
                             </div>
                             <input

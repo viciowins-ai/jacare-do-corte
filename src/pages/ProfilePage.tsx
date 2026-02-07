@@ -136,7 +136,11 @@ export function ProfilePage() {
                         <h2 className="text-xl font-bold mb-1">{user?.user_metadata?.full_name || 'Visitante'}</h2>
                         <div className="flex items-center gap-2">
                             <p className="text-white/80 text-sm">{user?.user_metadata?.phone || 'Sem telefone'}</p>
+<<<<<<< HEAD
                             <button
+=======
+                            <button 
+>>>>>>> b7dbf5d15f07ccdcc54e4a402d37f315bf2b27ac
                                 onClick={() => navigate('/complete-register', { state: { editing: true } })}
                                 className="bg-white/20 p-1.5 rounded-full hover:bg-white/30 transition-colors"
                                 title="Editar Telefone"
