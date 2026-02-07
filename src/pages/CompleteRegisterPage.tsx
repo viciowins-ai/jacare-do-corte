@@ -21,7 +21,11 @@ export function CompleteRegisterPage() {
                 navigate('/home', { replace: true });
             }
         }
-    }, [user, navigate, location]);
+        // Se usuário não existir, ProtectedRoute já deve ter lidado, mas por segurança:
+        if (!user && !loading) {
+            // navigate('/login'); // Deixa o ProtectedRoute lidar
+        }
+    }, [user, navigate, location, loading]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,17 +33,26 @@ export function CompleteRegisterPage() {
         setError(null);
 
         try {
+            // 1. Verificação de Sessão Ativa (Crucial para Mobile/OAuth)
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+            if (sessionError || !session) {
+                console.log('Sessão perdida, tentando refresh...');
+                const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+
+                if (refreshError || !refreshedSession) {
+                    throw new Error('Sessão expirada. Por favor, faça login novamente.');
+                }
+            }
+
             // Format Phone
             let formattedPhone = phone.replace(/\D/g, '');
+
             // Basic validation
             if (formattedPhone.length < 10) {
                 throw new Error('Número de telefone inválido.');
             }
-<<<<<<< HEAD
 
-=======
-            
->>>>>>> b7dbf5d15f07ccdcc54e4a402d37f315bf2b27ac
             // Add +55 if missing (assuming BR for now as per previous logic)
             if (formattedPhone.length === 10 || formattedPhone.length === 11) {
                 formattedPhone = '55' + formattedPhone;
@@ -63,7 +76,13 @@ export function CompleteRegisterPage() {
 
         } catch (err: any) {
             console.error('Erro ao salvar telefone:', err);
-            setError(err.message || 'Erro ao salvar. Tente novamente.');
+            // Se for erro de sessão, redirecionar para login após um tempo ou mostrar botão
+            if (err.message?.includes('Sessão expirada') || err.message?.includes('session missing')) {
+                setError('Sessão expirada. Redirecionando para login...');
+                setTimeout(() => navigate('/login'), 2000);
+            } else {
+                setError(err.message || 'Erro ao salvar. Tente novamente.');
+            }
         } finally {
             setLoading(false);
         }
@@ -72,11 +91,7 @@ export function CompleteRegisterPage() {
     return (
         <div className="flex flex-col h-screen bg-[#F5F5F7] items-center justify-center px-6">
             <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 text-center">
-<<<<<<< HEAD
 
-=======
-                
->>>>>>> b7dbf5d15f07ccdcc54e4a402d37f315bf2b27ac
                 <div className="w-20 h-20 bg-[#2E5C38] rounded-full mx-auto flex items-center justify-center mb-6 shadow-lg text-white">
                     <Phone size={32} />
                 </div>
@@ -96,11 +111,7 @@ export function CompleteRegisterPage() {
                     <div className="relative group text-left">
                         <label className="text-xs font-bold text-gray-500 ml-1 uppercase mb-1 block">Celular / WhatsApp</label>
                         <div className="relative">
-<<<<<<< HEAD
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-=======
-                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
->>>>>>> b7dbf5d15f07ccdcc54e4a402d37f315bf2b27ac
                                 <Phone size={20} />
                             </div>
                             <input
