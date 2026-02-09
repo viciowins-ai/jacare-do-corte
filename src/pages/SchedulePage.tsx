@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MockDB } from '../lib/mockDb';
 import { ArrowLeft, Scissors, User, Monitor, PlayCircle, Settings, Lock } from 'lucide-react';
-import { ImageWithFallback } from '../components/ImageWithFallback';
+
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 
@@ -347,12 +347,14 @@ export function SchedulePage() {
                                 className="flex items-center justify-between cursor-pointer"
                             >
                                 <div className="flex items-center gap-2">
-                                    <ImageWithFallback
-                                        src={barber.avatar_url}
-                                        fallbackSrc={`https://ui-avatars.com/api/?name=${barber.name}&background=random`}
-                                        type="barber"
-                                        className="w-6 h-6 rounded-full bg-yellow-100 object-cover"
+                                    <img
+                                        src={barber.avatar_url || '/logo_jacare.jpg'}
+                                        className="w-12 h-12 rounded-full object-cover border-2 border-[#2E5C38] shadow-sm"
                                         alt={barber.name}
+                                        onError={(e) => {
+                                            e.currentTarget.onerror = null; // Previne loop infinito
+                                            e.currentTarget.src = `https://ui-avatars.com/api/?name=${barber.name}&background=random&color=fff&background=2E5C38`;
+                                        }}
                                     />
                                     <span className="text-xs font-bold text-gray-900 dark:text-gray-200">{barber.name}</span>
                                 </div>
