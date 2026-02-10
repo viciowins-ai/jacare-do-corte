@@ -139,20 +139,31 @@ export function AdminDashboardPage() {
             console.warn('3. Se o agendamento foi para HOJE');
         }
 
-        // Calculate stats
+        // Calculate stats - MOSTRANDO TODOS OS AGENDAMENTOS (não só de hoje)
+        console.log('📊 Calculando estatísticas...');
+        console.log(`  Total de agendamentos: ${allAppointments.length}`);
+
+        // Mostrar data de cada agendamento
+        allAppointments.forEach((apt, index) => {
+            console.log(`  ${index + 1}. Data: ${apt.start_time} - Serviço: ${(apt.services as any)?.name} - Preço: R$ ${(apt.services as any)?.price || 0}`);
+        });
+
         const todayAppointments = allAppointments.filter(a => isSameDay(parseISO(a.start_time), new Date()));
-        const todayRevenue = todayAppointments.reduce((acc, curr) => {
-            // Handle both Supabase structure (services.price) and MockDB structure (services.price)
+        console.log(`  Agendamentos de HOJE (${new Date().toLocaleDateString()}): ${todayAppointments.length}`);
+
+        // TEMPORÁRIO: Usar TODOS os agendamentos ao invés de só hoje
+        const statsAppointments = allAppointments; // todayAppointments;
+        const totalRevenue = statsAppointments.reduce((acc, curr) => {
             const price = (curr.services as any)?.price || 0;
-            console.log(`  Agendamento ${curr.id}: R$ ${price}`);
             return acc + price;
         }, 0);
 
-        console.log(`💰 Faturamento de hoje: R$ ${todayRevenue}`);
+        console.log(`💰 Faturamento TOTAL: R$ ${totalRevenue}`);
+        console.log(`📅 Agendamentos TOTAIS: ${statsAppointments.length}`);
 
         setStats({
-            todayCount: todayAppointments.length,
-            todayRevenue: todayRevenue
+            todayCount: statsAppointments.length,
+            todayRevenue: totalRevenue
         });
 
         setLoading(false);
