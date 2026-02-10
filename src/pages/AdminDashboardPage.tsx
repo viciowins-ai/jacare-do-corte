@@ -118,7 +118,7 @@ export function AdminDashboardPage() {
                 // Calculate stats
                 setStats({
                     todayCount: supabaseData.filter(a => isSameDay(parseISO(a.start_time), new Date())).length,
-                    todayRevenue: supabaseData.filter(a => isSameDay(parseISO(a.start_time), new Date())).reduce((acc, curr) => acc + (curr.services?.price || 0), 0)
+                    todayRevenue: supabaseData.filter(a => isSameDay(parseISO(a.start_time), new Date())).reduce((acc, curr) => acc + ((curr.services as any)?.price || 0), 0)
                 });
             } else {
                 // Fallback to MockDB if no Supabase data
