@@ -91,19 +91,16 @@ export function AdminDashboardPage() {
             const { data: supabaseData, error } = await supabase
                 .from('appointments')
                 .select(`
-                    id,
-                    start_time,
-                    status,
-                    user_id,
-                    profiles:user_id (
+                    *,
+                    profiles!user_id (
                         full_name,
                         phone
                     ),
-                    services:service_id (
+                    services!service_id (
                         name,
                         price
                     ),
-                    barbers:barber_id (
+                    barbers!barber_id (
                         name
                     )
                 `)
@@ -112,7 +109,7 @@ export function AdminDashboardPage() {
             if (error) throw error;
 
             // If Supabase fetch succeeded, use that data
-            if (supabaseData && supabaseData.length > 0) {
+            if (supabaseData) {
                 setAppointments(supabaseData as any);
 
                 // Calculate stats
@@ -121,8 +118,8 @@ export function AdminDashboardPage() {
                     todayRevenue: supabaseData.filter(a => isSameDay(parseISO(a.start_time), new Date())).reduce((acc, curr) => acc + ((curr.services as any)?.price || 0), 0)
                 });
             } else {
-                // Fallback to MockDB if no Supabase data
-                throw new Error('No Supabase data, using MockDB');
+                // Fallback to MockDB if Supabase failed
+                throw new Error('Supabase returned null, using MockDB');
             }
         } catch (error) {
             console.log('Supabase fetch failed, using MockDB:', error);
