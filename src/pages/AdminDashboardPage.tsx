@@ -140,9 +140,19 @@ export function AdminDashboardPage() {
         }
 
         // Calculate stats
+        const todayAppointments = allAppointments.filter(a => isSameDay(parseISO(a.start_time), new Date()));
+        const todayRevenue = todayAppointments.reduce((acc, curr) => {
+            // Handle both Supabase structure (services.price) and MockDB structure (services.price)
+            const price = (curr.services as any)?.price || 0;
+            console.log(`  Agendamento ${curr.id}: R$ ${price}`);
+            return acc + price;
+        }, 0);
+
+        console.log(`💰 Faturamento de hoje: R$ ${todayRevenue}`);
+
         setStats({
-            todayCount: allAppointments.filter(a => isSameDay(parseISO(a.start_time), new Date())).length,
-            todayRevenue: allAppointments.filter(a => isSameDay(parseISO(a.start_time), new Date())).reduce((acc, curr) => acc + (curr.services?.price || curr.services?.price || 0), 0)
+            todayCount: todayAppointments.length,
+            todayRevenue: todayRevenue
         });
 
         setLoading(false);
