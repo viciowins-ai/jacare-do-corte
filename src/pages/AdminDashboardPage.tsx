@@ -129,6 +129,15 @@ export function AdminDashboardPage() {
 
         // Set appointments (from MockDB + Supabase)
         setAppointments(allAppointments as AdminAppointment[]);
+        console.log(`📋 TOTAL de agendamentos carregados: ${allAppointments.length}`);
+        if (allAppointments.length > 0) {
+            console.log('Primeiro agendamento:', allAppointments[0]);
+        } else {
+            console.warn('⚠️ NENHUM agendamento encontrado! Verifique:');
+            console.warn('1. localStorage.getItem("jacare_appointments")');
+            console.warn('2. Se você fez um agendamento e viu a tela de sucesso');
+            console.warn('3. Se o agendamento foi para HOJE');
+        }
 
         // Calculate stats
         setStats({
@@ -165,7 +174,8 @@ export function AdminDashboardPage() {
         ));
     };
 
-    const todayList = appointments.filter(a => isSameDay(parseISO(a.start_time), new Date()));
+    // TEMPORÁRIO: Mostrar TODOS os agendamentos (não só de hoje) para debug
+    const todayList = appointments; // appointments.filter(a => isSameDay(parseISO(a.start_time), new Date()));
 
     const handleApproveUser = (userId: string) => {
         // @ts-ignore
