@@ -214,6 +214,10 @@ export function SchedulePage() {
                     status: 'scheduled',
                     services: service,
                     barbers: selectedBarber,
+                    profiles: {
+                        full_name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Cliente',
+                        phone: user?.user_metadata?.phone || ''
+                    }
                 });
             });
 

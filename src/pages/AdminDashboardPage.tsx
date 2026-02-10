@@ -85,11 +85,50 @@ export function AdminDashboardPage() {
 
     const fetchAppointments = async () => {
         setLoading(true);
-        // Simulate fetch
-        setTimeout(() => {
+
+        try {
+            // Try to fetch from Supabase first with JOIN to get user profile data
+            const { data: supabaseData, error } = await supabase
+                .from('appointments')
+                .select(`
+                    id,
+                    start_time,
+                    status,
+                    user_id,
+                    profiles:user_id (
+                        full_name,
+                        phone
+                    ),
+                    services:service_id (
+                        name,
+                        price
+                    ),
+                    barbers:barber_id (
+                        name
+                    )
+                `)
+                .order('start_time', { ascending: true });
+
+            if (error) throw error;
+
+            // If Supabase fetch succeeded, use that data
+            if (supabaseData && supabaseData.length > 0) {
+                setAppointments(supabaseData as any);
+
+                // Calculate stats
+                setStats({
+                    todayCount: supabaseData.filter(a => isSameDay(parseISO(a.start_time), new Date())).length,
+                    todayRevenue: supabaseData.filter(a => isSameDay(parseISO(a.start_time), new Date())).reduce((acc, curr) => acc + (curr.services?.price || 0), 0)
+                });
+            } else {
+                // Fallback to MockDB if no Supabase data
+                throw new Error('No Supabase data, using MockDB');
+            }
+        } catch (error) {
+            console.log('Supabase fetch failed, using MockDB:', error);
+
+            // Fallback to MockDB (localStorage)
             const data: any[] = MockDB.getAppointments();
-            // Transform mock data to AdminAppointment structure if needed, or cast
-            // For now, we assume the structure matches enough or we cast
             setAppointments(data as AdminAppointment[]);
 
             // Mock Stats
@@ -97,9 +136,9 @@ export function AdminDashboardPage() {
                 todayCount: data.filter(a => isSameDay(parseISO(a.start_time), new Date())).length,
                 todayRevenue: data.filter(a => isSameDay(parseISO(a.start_time), new Date())).reduce((acc, curr) => acc + (curr.services?.price || 0), 0)
             });
-
+        } finally {
             setLoading(false);
-        }, 500);
+        }
     };
 
     // ...
