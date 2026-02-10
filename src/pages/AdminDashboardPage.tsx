@@ -86,8 +86,15 @@ export function AdminDashboardPage() {
     const fetchAppointments = async () => {
         setLoading(true);
 
+        let allAppointments: any[] = [];
+
+        // ALWAYS load from MockDB first (localStorage)
+        const mockData: any[] = MockDB.getAppointments();
+        console.log(`📦 MockDB: ${mockData.length} agendamentos`);
+        allAppointments = [...mockData];
+
+        // Try to fetch from Supabase and merge
         try {
-            // Try to fetch from Supabase first with JOIN to get user profile data
             const { data: supabaseData, error } = await supabase
                 .from('appointments')
                 .select(`
@@ -106,36 +113,30 @@ export function AdminDashboardPage() {
                 `)
                 .order('start_time', { ascending: true });
 
-            if (error) throw error;
+            if (!error && supabaseData) {
+                console.log(`☁️ Supabase: ${supabaseData.length} agendamentos`);
 
-            // If Supabase fetch succeeded, use that data
-            if (supabaseData) {
-                setAppointments(supabaseData as any);
-
-                // Calculate stats
-                setStats({
-                    todayCount: supabaseData.filter(a => isSameDay(parseISO(a.start_time), new Date())).length,
-                    todayRevenue: supabaseData.filter(a => isSameDay(parseISO(a.start_time), new Date())).reduce((acc, curr) => acc + ((curr.services as any)?.price || 0), 0)
-                });
-            } else {
-                // Fallback to MockDB if Supabase failed
-                throw new Error('Supabase returned null, using MockDB');
+                // Merge Supabase data with MockDB (avoid duplicates by ID)
+                const mockIds = new Set(mockData.map(a => a.id));
+                const newSupabaseData = supabaseData.filter(a => !mockIds.has(a.id));
+                allAppointments = [...allAppointments, ...newSupabaseData];
+            } else if (error) {
+                console.warn('⚠️ Supabase error (using MockDB only):', error.message);
             }
         } catch (error) {
-            console.log('Supabase fetch failed, using MockDB:', error);
-
-            // Fallback to MockDB (localStorage)
-            const data: any[] = MockDB.getAppointments();
-            setAppointments(data as AdminAppointment[]);
-
-            // Mock Stats
-            setStats({
-                todayCount: data.filter(a => isSameDay(parseISO(a.start_time), new Date())).length,
-                todayRevenue: data.filter(a => isSameDay(parseISO(a.start_time), new Date())).reduce((acc, curr) => acc + (curr.services?.price || 0), 0)
-            });
-        } finally {
-            setLoading(false);
+            console.warn('⚠️ Supabase failed (using MockDB only):', error);
         }
+
+        // Set appointments (from MockDB + Supabase)
+        setAppointments(allAppointments as AdminAppointment[]);
+
+        // Calculate stats
+        setStats({
+            todayCount: allAppointments.filter(a => isSameDay(parseISO(a.start_time), new Date())).length,
+            todayRevenue: allAppointments.filter(a => isSameDay(parseISO(a.start_time), new Date())).reduce((acc, curr) => acc + (curr.services?.price || curr.services?.price || 0), 0)
+        });
+
+        setLoading(false);
     };
 
     // ...
