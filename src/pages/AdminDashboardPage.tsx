@@ -16,7 +16,7 @@ import {
     ShieldAlert
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { format, isSameDay, parseISO } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { MockDB } from '../lib/mockDb';
 
@@ -90,7 +90,6 @@ export function AdminDashboardPage() {
 
         // ALWAYS load from MockDB first (localStorage)
         const mockData: any[] = MockDB.getAppointments();
-        console.log(`📦 MockDB: ${mockData.length} agendamentos`);
         allAppointments = [...mockData];
 
         // Try to fetch from Supabase and merge
@@ -114,52 +113,24 @@ export function AdminDashboardPage() {
                 .order('start_time', { ascending: true });
 
             if (!error && supabaseData) {
-                console.log(`☁️ Supabase: ${supabaseData.length} agendamentos`);
-
                 // Merge Supabase data with MockDB (avoid duplicates by ID)
                 const mockIds = new Set(mockData.map(a => a.id));
                 const newSupabaseData = supabaseData.filter(a => !mockIds.has(a.id));
                 allAppointments = [...allAppointments, ...newSupabaseData];
-            } else if (error) {
-                console.warn('⚠️ Supabase error (using MockDB only):', error.message);
             }
         } catch (error) {
-            console.warn('⚠️ Supabase failed (using MockDB only):', error);
+            // Silently use MockDB if Supabase fails
         }
 
         // Set appointments (from MockDB + Supabase)
         setAppointments(allAppointments as AdminAppointment[]);
-        console.log(`📋 TOTAL de agendamentos carregados: ${allAppointments.length}`);
-        if (allAppointments.length > 0) {
-            console.log('Primeiro agendamento:', allAppointments[0]);
-        } else {
-            console.warn('⚠️ NENHUM agendamento encontrado! Verifique:');
-            console.warn('1. localStorage.getItem("jacare_appointments")');
-            console.warn('2. Se você fez um agendamento e viu a tela de sucesso');
-            console.warn('3. Se o agendamento foi para HOJE');
-        }
 
-        // Calculate stats - MOSTRANDO TODOS OS AGENDAMENTOS (não só de hoje)
-        console.log('📊 Calculando estatísticas...');
-        console.log(`  Total de agendamentos: ${allAppointments.length}`);
-
-        // Mostrar data de cada agendamento
-        allAppointments.forEach((apt, index) => {
-            console.log(`  ${index + 1}. Data: ${apt.start_time} - Serviço: ${(apt.services as any)?.name} - Preço: R$ ${(apt.services as any)?.price || 0}`);
-        });
-
-        const todayAppointments = allAppointments.filter(a => isSameDay(parseISO(a.start_time), new Date()));
-        console.log(`  Agendamentos de HOJE (${new Date().toLocaleDateString()}): ${todayAppointments.length}`);
-
-        // TEMPORÁRIO: Usar TODOS os agendamentos ao invés de só hoje
-        const statsAppointments = allAppointments; // todayAppointments;
+        // Calculate stats - Mostrando todos os agendamentos
+        const statsAppointments = allAppointments;
         const totalRevenue = statsAppointments.reduce((acc, curr) => {
             const price = (curr.services as any)?.price || 0;
             return acc + price;
         }, 0);
-
-        console.log(`💰 Faturamento TOTAL: R$ ${totalRevenue}`);
-        console.log(`📅 Agendamentos TOTAIS: ${statsAppointments.length}`);
 
         setStats({
             todayCount: statsAppointments.length,

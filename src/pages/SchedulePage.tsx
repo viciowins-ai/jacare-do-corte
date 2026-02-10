@@ -140,21 +140,12 @@ export function SchedulePage() {
         const isAdmin = user.email === 'admin@jacare.com' || user.email === 'dono@jacare.com' || user.email === 'araucariainforma@gmail.com' || user.email === 'viciowins@gmail.com';
         const status = MockDB.getUserStatus(user.id);
 
-        console.log('🔐 Verificação de acesso:');
-        console.log('  Email:', user.email);
-        console.log('  É Admin?', isAdmin);
-        console.log('  Status:', status);
-
         if (!isAdmin && status !== 'approved') {
-            console.warn('⚠️ Agendamento bloqueado - usuário não aprovado');
-            // Opcional: Mostrar um alerta ou modal antes de redirecionar
             if (confirm("Para realizar agendamentos exclusivos, torne-se um membro do clube!\n\nDeseja ativar sua assinatura agora?")) {
                 navigate('/payment');
             }
             return;
         }
-
-        console.log('✅ Acesso liberado! Prosseguindo com agendamento...');
         // -------------------------------------
 
         setLoading(true);
@@ -175,8 +166,6 @@ export function SchedulePage() {
             const selectedBarber = barbers.find(b => b.id === selectedBarberId);
             const selectedServicesList = services.filter(s => selectedServiceIds.includes(s.id as number));
 
-            console.log('☁️ Tentando salvar no Supabase...');
-
             // Create an array of promises to insert multiple appointments
             const appointmentPromises = selectedServiceIds.map(serviceId =>
                 supabase
@@ -196,12 +185,8 @@ export function SchedulePage() {
 
             // Check for errors in any of the requests
             const errors = results.filter(r => r.error);
-            if (errors.length > 0) {
-                console.error('❌ Erro do Supabase:', errors[0].error);
-                throw errors[0].error;
-            }
+            if (errors.length > 0) throw errors[0].error;
 
-            console.log('✅ Salvo no Supabase com sucesso!');
             const serviceNames = selectedServicesList.map(s => s.name).join(' + ');
 
             navigate('/booking-success', {
@@ -212,10 +197,6 @@ export function SchedulePage() {
                 }
             });
         } catch (error) {
-            console.error('❌ Erro ao agendar no Supabase:', error);
-
-            console.log('📦 Usando fallback: salvando no MockDB (localStorage)...');
-
             // Fallback: Save to Local Mock DB (Offline Mode)
             const selectedBarber = barbers.find(b => b.id === selectedBarberId);
             const selectedServicesList = services.filter(s => selectedServiceIds.includes(s.id as number));
@@ -228,8 +209,8 @@ export function SchedulePage() {
             const startTime = `${dateStr}T${selectedTime}:00`;
 
             // For MockDB, we'll iterate too
-            selectedServicesList.forEach((service, index) => {
-                const appointment = {
+            selectedServicesList.forEach(service => {
+                MockDB.addAppointment({
                     user_id: user?.id || 'offline-user',
                     start_time: startTime,
                     status: 'scheduled',
@@ -239,12 +220,9 @@ export function SchedulePage() {
                         full_name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Cliente',
                         phone: user?.user_metadata?.phone || ''
                     }
-                };
-                console.log(`  Salvando serviço ${index + 1}/${selectedServicesList.length}:`, appointment);
-                MockDB.addAppointment(appointment);
+                });
             });
 
-            console.log('✅ Salvo no MockDB com sucesso!');
             const serviceNames = selectedServicesList.map(s => s.name).join(' + ');
 
             navigate('/booking-success', {
