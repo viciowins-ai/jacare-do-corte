@@ -57,29 +57,29 @@ export const MockDB = {
     },
 
     // --- USER PAYMENT SIMULATION ---
-    USER_KEY: 'jacare_users_status_v5',
-    PENDING_REQUESTS_KEY: 'jacare_pending_requests_v5',
+    USER_KEY: 'jacare_users_status_v6',
+    PENDING_REQUESTS_KEY: 'jacare_pending_requests_v6',
 
     updateUserStatus: (userId: string, status: 'approved' | 'pending' | 'blocked') => {
-        const users = JSON.parse(localStorage.getItem('jacare_users_status_v5') || '{}');
+        const users = JSON.parse(localStorage.getItem('jacare_users_status_v6') || '{}');
         users[userId] = status;
-        localStorage.setItem('jacare_users_status_v5', JSON.stringify(users));
+        localStorage.setItem('jacare_users_status_v6', JSON.stringify(users));
 
         // If approved, remove from pending requests
         if (status === 'approved') {
-            const requests = JSON.parse(localStorage.getItem('jacare_pending_requests_v5') || '[]');
+            const requests = JSON.parse(localStorage.getItem('jacare_pending_requests_v6') || '[]');
             const newRequests = requests.filter((r: any) => r.userId !== userId);
-            localStorage.setItem('jacare_pending_requests_v5', JSON.stringify(newRequests));
+            localStorage.setItem('jacare_pending_requests_v6', JSON.stringify(newRequests));
         }
     },
 
     getUserStatus: (userId: string): 'approved' | 'pending' | 'blocked' => {
-        const users = JSON.parse(localStorage.getItem('jacare_users_status_v5') || '{}');
+        const users = JSON.parse(localStorage.getItem('jacare_users_status_v6') || '{}');
         return users[userId] || 'pending'; // Default to pending
     },
 
     addPendingRequest: (user: any) => {
-        const requests = JSON.parse(localStorage.getItem('jacare_pending_requests_v5') || '[]');
+        const requests = JSON.parse(localStorage.getItem('jacare_pending_requests_v6') || '[]');
         // Check if already exists
         if (!requests.find((r: any) => r.userId === user.id)) {
             requests.push({
@@ -89,11 +89,11 @@ export const MockDB = {
                 phone: user.user_metadata?.phone || '',
                 timestamp: new Date().toISOString()
             });
-            localStorage.setItem('jacare_pending_requests_v5', JSON.stringify(requests));
+            localStorage.setItem('jacare_pending_requests_v6', JSON.stringify(requests));
         }
     },
 
     getPendingRequests: () => {
-        return JSON.parse(localStorage.getItem('jacare_pending_requests_v5') || '[]');
+        return JSON.parse(localStorage.getItem('jacare_pending_requests_v6') || '[]');
     }
 };

@@ -40,7 +40,7 @@ export async function getUserRole(email: string | undefined): Promise<UserRole> 
     if (email === 'araucariainforma@gmail.com') return 'master';
 
     // Hardcoded Admin Email (O Dono)
-    if (email === 'viciowins@gmail.com') return 'admin';
+    if (email === 'wagner.oliveira.mendes@escola.pr.gov.br') return 'admin';
 
     // Futuramente, buscaremos do banco se tivermos barbeiros cadastrados
     // const { data } = await supabase.from('users').select('role').eq('email', email).single();

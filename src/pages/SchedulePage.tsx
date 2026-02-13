@@ -36,7 +36,7 @@ export function SchedulePage() {
     const [userStatus, setUserStatus] = useState<'pending' | 'approved' | 'blocked'>('pending');
 
     // Admin Check helper
-    const isAdmin = user?.email === 'admin@jacare.com' || user?.email === 'dono@jacare.com' || user?.email === 'araucariainforma@gmail.com' || user?.email === 'viciowins@gmail.com';
+    const isAdmin = user?.email === 'admin@jacare.com' || user?.email === 'dono@jacare.com' || user?.email === 'araucariainforma@gmail.com' || user?.email === 'wagner.oliveira.mendes@escola.pr.gov.br';
     const isVisitor = user?.email === 'visitante_v5@jacare.com';
     const isLocked = !isVisitor && !isAdmin && userStatus !== 'approved' && userStatus !== 'blocked'; // Blocked users handled differently usually, but pending needs lock
 
@@ -137,7 +137,7 @@ export function SchedulePage() {
         }
 
         // --- TRAVA DE PAGAMENTO (FREEMIUM) ---
-        const isAdmin = user.email === 'admin@jacare.com' || user.email === 'dono@jacare.com' || user.email === 'araucariainforma@gmail.com' || user.email === 'viciowins@gmail.com';
+        const isAdmin = user.email === 'admin@jacare.com' || user.email === 'dono@jacare.com' || user.email === 'araucariainforma@gmail.com' || user.email === 'wagner.oliveira.mendes@escola.pr.gov.br';
         const status = MockDB.getUserStatus(user.id);
 
         if (!isAdmin && status !== 'approved') {
