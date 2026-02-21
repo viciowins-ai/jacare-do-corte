@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Session, User } from '@supabase/supabase-js';
@@ -26,7 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Check active sessions
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
-            setUser(session?.user ?? null); // Keep setUser here to initialize user state
+            setUser(session?.user ?? null);
             setLoading(false);
             if (session?.user?.email) {
                 console.log(`[Auth] Usuário logado: ${session.user.email}`);
@@ -35,20 +34,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const {
             data: { subscription },
-        } = supabase.auth.onAuthStateChange((_event, session) => {
+        } = supabase.auth.onAuthStateChange((event, session) => {
             setSession(session);
-            setUser(session?.user ?? null); // Keep setUser here to update user state on auth change
+            setUser(session?.user ?? null);
             setLoading(false);
+
+            // ✅ Novo usuário Google sem telefone → redireciona para completar perfil
+            if (event === 'SIGNED_IN' && session?.user) {
+                const u = session.user;
+                const isGoogle = u.app_metadata?.provider === 'google' || u.identities?.some(i => i.provider === 'google');
+                const hasPhone = u.phone || u.user_metadata?.phone;
+
+                if (isGoogle && !hasPhone) {
+                    // Use a small timeout to let the router mount before redirecting
+                    setTimeout(() => {
+                        // Only redirect if not already on complete-register
+                        if (!window.location.hash.includes('complete-register')) {
+                            window.location.hash = '#/complete-register';
+                        }
+                    }, 300);
+                }
+            }
         });
 
         // Demo Mode Handler
         const checkDemo = () => {
             const isDemo = localStorage.getItem('demo_mode') === 'true';
-            // Use the current session state from the closure or ensure it's updated
-            // For `checkDemo` to react to `session` changes, it needs to be inside the effect or `session` in deps
-            // Given the instruction, we'll keep it as is, but note the potential for stale `session` in `checkDemo` if `session` isn't in deps.
-            // However, `onAuthStateChange` and `getSession` handle the primary auth state.
-            if (isDemo && !session) { // This `session` refers to the state at the time of effect run
+            if (isDemo && !session) {
                 const demoUser: any = {
                     id: 'visitante-novo-v5',
                     email: 'visitante_v5@jacare.com',
@@ -70,11 +82,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const signOut = async () => {
         localStorage.removeItem('demo_mode');
-        // Force reload to clear context state effectively if relying on internal state
-        if (localStorage.getItem('demo_mode') === null) {
-            setSession(null);
-            setUser(null);
-        }
+        setSession(null);
+        setUser(null);
         await supabase.auth.signOut();
     };
 
