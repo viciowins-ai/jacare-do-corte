@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Copy, CheckCircle, Lock, MessageCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { MockDB } from '../lib/mockDb';
+import { supabase } from '../lib/supabase';
 
 export function PaymentPage() {
     const navigate = useNavigate();
@@ -20,22 +21,28 @@ export function PaymentPage() {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const handleNotifyPayment = () => {
-        // Here we would ideally update the DB status to 'pending_approval'
-        // For now, in our Mock setup, we'll simulate sending a message
+    const handleNotifyPayment = async () => {
         setNotified(true);
 
-        // Update local mock user status
         if (user) {
-            MockDB.updateUserStatus(user.id, 'pending');
-            MockDB.addPendingRequest(user);
+            // ✅ Save to Supabase (real)
+            try {
+                await supabase.from('payment_requests').upsert({
+                    user_id: user.id,
+                    user_email: user.email,
+                    user_name: user.user_metadata?.full_name || '',
+                    user_phone: user.user_metadata?.phone || user.phone || '',
+                    status: 'pending'
+                }, { onConflict: 'user_id' });
+            } catch (e) {
+                // Fallback to MockDB
+                MockDB.updateUserStatus(user.id, 'pending');
+                MockDB.addPendingRequest(user);
+            }
         }
 
-        // Redirect to WhatsApp with pre-filled message
-        const message = `Olá! Fiz o PIX de R$ ${APP_PRICE} para liberar meu acesso no App Jacaré do Corte (Android/iPhone). Meu email de cadastro é: ${user?.email}`;
+        const message = `Olá! Fiz o PIX de R$ ${APP_PRICE} para liberar meu acesso no App Jacaré do Corte. Meu email: ${user?.email}`;
         const whatsappLink = `https://wa.me/554199904961?text=${encodeURIComponent(message)}`;
-
-        // Open WhatsApp in new tab
         window.open(whatsappLink, '_blank');
     };
 

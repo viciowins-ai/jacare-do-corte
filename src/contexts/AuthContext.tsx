@@ -6,6 +6,7 @@ interface AuthContextType {
     session: Session | null;
     user: User | null;
     loading: boolean;
+    appStatus: 'active' | 'blocked' | 'loading';
     signOut: () => Promise<void>;
 }
 
@@ -13,6 +14,7 @@ const AuthContext = createContext<AuthContextType>({
     session: null,
     user: null,
     loading: true,
+    appStatus: 'loading',
     signOut: async () => { },
 });
 
@@ -20,8 +22,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [session, setSession] = useState<Session | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const [appStatus, setAppStatus] = useState<'active' | 'blocked' | 'loading'>('loading');
+
+    // ✅ Checks app_status from Supabase
+    const checkAppStatus = async () => {
+        try {
+            const { data } = await supabase
+                .from('app_settings')
+                .select('value')
+                .eq('key', 'app_status')
+                .single();
+            setAppStatus((data?.value as 'active' | 'blocked') || 'active');
+        } catch {
+            setAppStatus('active'); // Fail-open: if Supabase is down, allow access
+        }
+    };
 
     useEffect(() => {
+        checkAppStatus();
+
         // Check active sessions
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
@@ -46,9 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const hasPhone = u.phone || u.user_metadata?.phone;
 
                 if (isGoogle && !hasPhone) {
-                    // Use a small timeout to let the router mount before redirecting
                     setTimeout(() => {
-                        // Only redirect if not already on complete-register
                         if (!window.location.hash.includes('complete-register')) {
                             window.location.hash = '#/complete-register';
                         }
@@ -74,9 +91,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         checkDemo();
         window.addEventListener('storage', checkDemo);
 
+        // ✅ Re-check app status every 60 seconds (in case admin blocks mid-session)
+        const statusInterval = setInterval(checkAppStatus, 60000);
+
         return () => {
             subscription.unsubscribe();
             window.removeEventListener('storage', checkDemo);
+            clearInterval(statusInterval);
         };
     }, []);
 
@@ -88,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ session, user, loading, signOut }}>
+        <AuthContext.Provider value={{ session, user, loading, appStatus, signOut }}>
             {!loading && children}
         </AuthContext.Provider>
     );
